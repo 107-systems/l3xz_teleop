@@ -4,8 +4,8 @@
 
 ### How-to-build
 ```bash
-# Clone this repository.
-cd catkin_ws/src && git clone https://github.com/107-systems/l3xz_teleop && cd ..
+# Clone this repository into catkin_ws/src.
+git clone https://github.com/107-systems/l3xz_teleop
 # Invoke catkin_make from the catkin workspace root.
 source /opt/ros/noetic/setup.bash
 catkin_make
