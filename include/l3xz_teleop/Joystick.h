@@ -12,6 +12,7 @@
  **************************************************************************************/
 
 #include <string>
+#include <optional>
 
 #include "JoystickEvent.h"
 
@@ -26,7 +27,7 @@ public:
    Joystick(std::string const & dev_node);
   ~Joystick();
 
-  JoystickEvent update();
+  std::optional<JoystickEvent> update();
 
 private:
   int _fd;

@@ -10,8 +10,10 @@
 
 #include <l3xz_teleop/Joystick.h>
 
+#include <errno.h>
 #include <fcntl.h>
 #include <unistd.h>
+#include <string.h>
 
 #include <stdexcept>
 
@@ -20,8 +22,9 @@
  **************************************************************************************/
 
 Joystick::Joystick(std::string const & dev_node)
-: _fd{open(dev_node.c_str(), O_RDONLY)}
+: _fd{open(dev_node.c_str(), O_RDONLY | O_NONBLOCK)}
 {
+
 }
 
 Joystick::~Joystick()
@@ -33,13 +36,18 @@ Joystick::~Joystick()
  * PUBLIC MEMBER FUNCTIONS
  **************************************************************************************/
 
-JoystickEvent Joystick::update()
+std::optional<JoystickEvent> Joystick::update()
 {
 	JoystickEvent evt;
   
   if (auto const bytes_read = read(_fd, &evt, sizeof(JoystickEvent));
       bytes_read != sizeof(JoystickEvent))
-    throw std::runtime_error("Error reading from joystick");
+  {
+    if (errno != EAGAIN) {
+      throw std::runtime_error("Error while reading from joystick: " + std::string(strerror(errno)));
+    }
+    return std::nullopt;
+  }
 
   return evt;
 }

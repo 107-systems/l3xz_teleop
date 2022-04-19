@@ -37,11 +37,14 @@ int main(int argc, char **argv) try
 
   while (ros::ok())
   {
-    JoystickEvent const evt = joystick.update();
+    std::optional<JoystickEvent> const evt = joystick.update();
 
-    if (evt.isAxis())
+    if (evt)
     {
-      ROS_INFO("Axis %d: %d", evt.number, evt.value);
+      if (evt.value().isAxis())
+      {
+        ROS_INFO("Axis %d: %d", evt.value().number, evt.value().value);
+      }
     }
 
     ros::spinOnce();
