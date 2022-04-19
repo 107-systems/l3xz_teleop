@@ -33,11 +33,9 @@ Right joystick:
 | Default name | Type |
 |:-:|:-:|
 | `/l3xz/cmd_vel` | [`geometry_msgs/Twist`](https://docs.ros.org/en/noetic/api/geometry_msgs/html/msg/Twist.html) |
-| `/l3xz/cmd_head_pose` | [`geometry_msgs/Quaternion`](https://docs.ros.org/en/noetic/api/geometry_msgs/html/msg/Quaternion.html) |
 
 #### Parameters
 | Name | Default | Description |
 |:-:|:-:|:-:|
 | `joy_dev_node` | `/dev/input/js0` | Name of input device node under which joystick is registed in Linux. |
 | `topic_robot_velocity` | `cmd_vel` | Name of topic for controlling L3X-Z foward/sideways/angular speed (linear.x/y, angular.z) |
-| `topic_sensor_head_pose` | `cmd_head_pose` | Name of topic for pose of L3X-Z's sensor head. |
