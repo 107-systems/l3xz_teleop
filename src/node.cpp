@@ -11,7 +11,6 @@
 #include <map>
 #include <string>
 #include <chrono>
-#include <vector>
 #include <limits>
 #include <numeric>
 
@@ -41,13 +40,14 @@ int main(int argc, char **argv)
 
   ROS_INFO("node config:\n  joy_dev_node: %s\n  joy_topic   : %s", joy_dev_node.c_str(), joy_topic.c_str());
 
-  ros::Publisher cmd_vel_pub = node_hdl.advertise<geometry_msgs::Twist>(joy_topic, 10);
+  ros::Publisher cmd_vel_pub = node_hdl.advertise<geometry_msgs::Twist>(joy_topic, 25);
 
   try
   {
     Joystick joystick(joy_dev_node);
 
-    std::map<PS3_AxisId, std::vector<float>> axis_data_vect;
+    geometry_msgs::Twist twist_msg;
+    std::map<PS3_AxisId, float> axis_data;
 
     for (auto prev = std::chrono::steady_clock::now(); ros::ok(); )
     {
@@ -66,7 +66,7 @@ int main(int argc, char **argv)
 
           PS3_AxisId const axis_id = static_cast<PS3_AxisId>(evt.value().number);
           float const axis_scaled_val = static_cast<float>(evt.value().value) / static_cast<float>(std::numeric_limits<int16_t>::max());
-          axis_data_vect[axis_id].push_back(axis_scaled_val);
+          axis_data[axis_id] = axis_scaled_val;
         }
 
         if (evt.value().isButton())
@@ -83,36 +83,29 @@ int main(int argc, char **argv)
       {
         prev = now;
 
-        geometry_msgs::Twist msg;
+        float linear_x = twist_msg.linear.x;
+        if (axis_data.count(PS3_AxisId::LEFT_STICK_VERTICAL))
+          linear_x = -1.0f * axis_data[PS3_AxisId::LEFT_STICK_VERTICAL];
 
-        auto getAvgFn = [&axis_data_vect](PS3_AxisId const id) -> float
-                        {
-                          if (!axis_data_vect.count(id))
-                            return 0.0f;
+        float linear_y = twist_msg.linear.y;
+        if (axis_data.count(PS3_AxisId::LEFT_STICK_HORIZONTAL))
+          linear_y = axis_data[PS3_AxisId::LEFT_STICK_HORIZONTAL];
 
-                          if (!axis_data_vect.at(id).size())
-                            return 0.0f;
+        float angular_z = 0.0f;
+        if (axis_data.count(PS3_AxisId::LEFT_REAR_2))
+          angular_z -= (axis_data[PS3_AxisId::LEFT_REAR_2] + 1.0f) / 2.0f;
+        if (axis_data.count(PS3_AxisId::RIGHT_REAR_2))
+          angular_z += (axis_data[PS3_AxisId::RIGHT_REAR_2] + 1.0f) / 2.0f;
 
-                          float const avg_axis_val = std::accumulate(axis_data_vect.at(id).begin(),
-                                                                     axis_data_vect.at(id).end(),
-                                                                     0.0f)
-                                                     /
-                                                     axis_data_vect.at(id).size();
+        twist_msg.linear.x  = linear_x;
+        twist_msg.linear.y  = linear_y;
+        twist_msg.linear.z  = 0.0;
 
-                          axis_data_vect.at(id).clear();
+        twist_msg.angular.x = 0.0;
+        twist_msg.angular.y = 0.0;
+        twist_msg.angular.z = angular_z;
 
-                          return avg_axis_val;
-                        };
-
-        msg.linear.x  = getAvgFn(PS3_AxisId::LEFT_STICK_VERTICAL);
-        msg.linear.y  = getAvgFn(PS3_AxisId::LEFT_STICK_HORIZONTAL);
-        msg.linear.z  = 0.0;
-
-        msg.angular.x = 0.0;
-        msg.angular.y = 0.0;
-        msg.angular.z = 0.0;
-
-        cmd_vel_pub.publish(msg);
+        cmd_vel_pub.publish(twist_msg);
       }
 
       ros::spinOnce();
