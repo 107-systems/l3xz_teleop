@@ -8,8 +8,12 @@
  * INCLUDE
  **************************************************************************************/
 
+#include <map>
 #include <string>
 #include <chrono>
+#include <vector>
+#include <limits>
+#include <numeric>
 
 #include <ros/ros.h>
 #include <ros/console.h>
@@ -43,16 +47,31 @@ int main(int argc, char **argv)
   {
     Joystick joystick(joy_dev_node);
 
+    std::map<PS3_AxisId, std::vector<float>> axis_data_vect;
+
     for (auto prev = std::chrono::steady_clock::now(); ros::ok(); )
     {
       /* Read data from the joystick and pre-process it. */
       std::optional<JoystickEvent> const evt = joystick.update();
 
+      /* Process the received event. */
       if (evt)
       {
+        if (evt.value().isInit())
+          continue;
+
         if (evt.value().isAxis())
         {
           ROS_INFO("Axis %d: %d", evt.value().number, evt.value().value);
+
+          PS3_AxisId const axis_id = static_cast<PS3_AxisId>(evt.value().number);
+          float const axis_scaled_val = static_cast<float>(evt.value().value) / static_cast<float>(std::numeric_limits<int16_t>::max());
+          axis_data_vect[axis_id].push_back(axis_scaled_val);
+        }
+
+        if (evt.value().isButton())
+        {
+          ROS_INFO("Button %d: %d", evt.value().number, evt.value().value);
         }
       }
 
@@ -66,13 +85,32 @@ int main(int argc, char **argv)
 
         geometry_msgs::Twist msg;
 
-        msg.linear.x  =  1.0;
-        msg.linear.y  = -1.0;
-        msg.linear.z  =  0.0;
+        auto getAvgFn = [&axis_data_vect](PS3_AxisId const id) -> float
+                        {
+                          if (!axis_data_vect.count(id))
+                            return 0.0f;
 
-        msg.angular.x =  1.0;
-        msg.angular.y = -1.0;
-        msg.angular.z =  0.0;
+                          if (!axis_data_vect.at(id).size())
+                            return 0.0f;
+
+                          float const avg_axis_val = std::accumulate(axis_data_vect.at(id).begin(),
+                                                                     axis_data_vect.at(id).end(),
+                                                                     0.0f)
+                                                     /
+                                                     axis_data_vect.at(id).size();
+
+                          axis_data_vect.at(id).clear();
+
+                          return avg_axis_val;
+                        };
+
+        msg.linear.x  = getAvgFn(PS3_AxisId::LEFT_STICK_VERTICAL);
+        msg.linear.y  = getAvgFn(PS3_AxisId::LEFT_STICK_HORIZONTAL);
+        msg.linear.z  = 0.0;
+
+        msg.angular.x = 0.0;
+        msg.angular.y = 0.0;
+        msg.angular.z = 0.0;
 
         cmd_vel_pub.publish(msg);
       }
