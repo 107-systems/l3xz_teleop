@@ -17,6 +17,7 @@
 #include <geometry_msgs/Twist.h>
 
 #include <l3xz_teleop/Joystick.h>
+#include <l3xz_teleop/PS3_Const.h>
 
 /**************************************************************************************
  * MAIN
