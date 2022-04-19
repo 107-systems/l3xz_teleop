@@ -18,6 +18,10 @@
 #include <ros/console.h>
 
 #include <geometry_msgs/Twist.h>
+#include <geometry_msgs/Quaternion.h>
+
+#include <tf2/LinearMath/Quaternion.h>
+#include <tf2_geometry_msgs/tf2_geometry_msgs.h>
 
 #include <l3xz_teleop/Joystick.h>
 #include <l3xz_teleop/PS3_Const.h>
@@ -33,14 +37,16 @@ int main(int argc, char **argv)
   ros::NodeHandle node_hdl;
   ros::NodeHandle node_hdl_private("~");
 
-  std::string joy_dev_node, joy_topic;
+  std::string joy_dev_node, topic_robot_velocity, topic_sensor_head_pose;
 
   node_hdl_private.param<std::string>("joy_dev_node", joy_dev_node, "/dev/input/js0");
-  node_hdl_private.param<std::string>("joy_topic", joy_topic, "cmd_vel");
+  node_hdl_private.param<std::string>("topic_robot_velocity", topic_robot_velocity, "cmd_vel");
+  node_hdl_private.param<std::string>("topic_sensor_head_pose", topic_sensor_head_pose, "cmd_head_pose");
 
-  ROS_INFO("node config:\n  joy_dev_node: %s\n  joy_topic   : %s", joy_dev_node.c_str(), joy_topic.c_str());
+  ROS_INFO("node config:\n  joy_dev_node          : %s\n  topic_robot_velocity  : %s\n  topic_sensor_head_pose: %s", joy_dev_node.c_str(), topic_robot_velocity.c_str(), topic_sensor_head_pose.c_str());
 
-  ros::Publisher cmd_vel_pub = node_hdl.advertise<geometry_msgs::Twist>(joy_topic, 25);
+  ros::Publisher cmd_vel_pub = node_hdl.advertise<geometry_msgs::Twist>(topic_robot_velocity, 25);
+  ros::Publisher sensor_head_pose_pub = node_hdl.advertise<geometry_msgs::Quaternion>(topic_sensor_head_pose.c_str(), 25);
 
   try
   {
@@ -48,6 +54,7 @@ int main(int argc, char **argv)
 
     geometry_msgs::Twist twist_msg;
     std::map<PS3_AxisId, float> axis_data;
+    float pitch = 0.0, yaw = 0.0;
 
     for (auto prev = std::chrono::steady_clock::now(); ros::ok(); )
     {
@@ -83,6 +90,7 @@ int main(int argc, char **argv)
       {
         prev = now;
 
+        /* cmd_vel */
         float linear_x = twist_msg.linear.x;
         if (axis_data.count(PS3_AxisId::LEFT_STICK_VERTICAL))
           linear_x = -1.0f * axis_data[PS3_AxisId::LEFT_STICK_VERTICAL];
@@ -106,6 +114,20 @@ int main(int argc, char **argv)
         twist_msg.angular.z = angular_z;
 
         cmd_vel_pub.publish(twist_msg);
+
+        /* cmd_head_pose */
+        if (axis_data.count(PS3_AxisId::RIGHT_STICK_VERTICAL))
+          pitch = -1.0f * axis_data[PS3_AxisId::RIGHT_STICK_VERTICAL] * 90.0f;
+
+        if (axis_data.count(PS3_AxisId::RIGHT_STICK_HORIZONTAL))
+          yaw = axis_data[PS3_AxisId::RIGHT_STICK_HORIZONTAL] * 90.0f;
+
+        tf2::Quaternion pose_quat_tf;
+        pose_quat_tf.setRPY(0.0f, pitch, yaw);
+
+        geometry_msgs::Quaternion pose_quat_msg;
+        tf2::convert(pose_quat_tf, pose_quat_msg);
+        sensor_head_pose_pub.publish(pose_quat_msg);
       }
 
       ros::spinOnce();
