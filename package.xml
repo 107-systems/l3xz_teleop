@@ -1,0 +1,28 @@
+<?xml version="1.0"?>
+<package format="2">
+  <name>l3xz_teleop</name>
+  <version>1.0.0</version>
+  <description>Teleoperation for L3X-Z via PS3 joystick and ROS topics.</description>
+
+  <maintainer email="consulting@lxrobotics.com">Alexander Entinger</maintainer>
+
+  <license>MIT</license>
+
+  <author email="consulting@lxrobotics.com">Alexander Entinger</author>
+
+  <buildtool_depend>catkin</buildtool_depend>
+  <build_depend>geometry_msgs</build_depend>
+  <build_depend>roscpp</build_depend>
+  <build_depend>std_msgs</build_depend>
+  <build_depend>tf2</build_depend>
+  <build_export_depend>geometry_msgs</build_export_depend>
+  <build_export_depend>roscpp</build_export_depend>
+  <build_export_depend>std_msgs</build_export_depend>
+  <build_export_depend>tf2</build_export_depend>
+  <exec_depend>geometry_msgs</exec_depend>
+  <exec_depend>roscpp</exec_depend>
+  <exec_depend>std_msgs</exec_depend>
+  <exec_depend>tf2</exec_depend>
+
+  <export></export>
+</package>

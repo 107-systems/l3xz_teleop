@@ -1,0 +1,7 @@
+<launch>
+  <node name="teleop_node" pkg="l3xz_teleop" type="l3xz_teleop_node" output="screen" ns="l3xz">
+    <param name="joy_dev_node" type="string" value="/dev/input/js0"/>
+    <param name="topic_robot_velocity" type="string" value="cmd_vel"/>
+    <param name="topic_sensor_head_pose" type="string" value="cmd_head_pose"/>
+  </node>
+</launch>
