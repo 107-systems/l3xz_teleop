@@ -87,35 +87,35 @@ int main(int argc, char **argv)
       {
         prev = now;
 
-        float linear_x = twist_msg.linear.x;
+        float linear_velocity_x = twist_msg.linear.x;
         if (axis_data.count(PS3_AxisId::LEFT_STICK_VERTICAL))
-          linear_x = -1.0f * axis_data[PS3_AxisId::LEFT_STICK_VERTICAL];
+          linear_velocity_x = -1.0f * axis_data[PS3_AxisId::LEFT_STICK_VERTICAL];
 
-        float linear_y = twist_msg.linear.y;
+        float linear_velocity_y = twist_msg.linear.y;
         if (axis_data.count(PS3_AxisId::LEFT_STICK_HORIZONTAL))
-          linear_y = axis_data[PS3_AxisId::LEFT_STICK_HORIZONTAL];
+          linear_velocity_y = axis_data[PS3_AxisId::LEFT_STICK_HORIZONTAL];
 
-        float angular_z = 0.0f;
-        if (axis_data.count(PS3_AxisId::LEFT_REAR_2))
-          angular_z -= (axis_data[PS3_AxisId::LEFT_REAR_2] + 1.0f) / 2.0f;
-        if (axis_data.count(PS3_AxisId::RIGHT_REAR_2))
-          angular_z += (axis_data[PS3_AxisId::RIGHT_REAR_2] + 1.0f) / 2.0f;
-
-        float pitch = twist_msg.angular.x;
+        float angular_velocity_head_tilt = twist_msg.angular.x;
         if (axis_data.count(PS3_AxisId::RIGHT_STICK_VERTICAL))
-          pitch = -1.0f * axis_data[PS3_AxisId::RIGHT_STICK_VERTICAL] * 90.0f;
+          angular_velocity_head_tilt = -1.0f * axis_data[PS3_AxisId::RIGHT_STICK_VERTICAL];
 
-        float yaw = twist_msg.angular.y;
+        float angular_velocity_head_pan = twist_msg.angular.y;
         if (axis_data.count(PS3_AxisId::RIGHT_STICK_HORIZONTAL))
-          yaw = axis_data[PS3_AxisId::RIGHT_STICK_HORIZONTAL] * 90.0f;
+          angular_velocity_head_pan = axis_data[PS3_AxisId::RIGHT_STICK_HORIZONTAL];
 
-        twist_msg.linear.x  = linear_x;
-        twist_msg.linear.y  = linear_y;
+        float angular_velocity_z = 0.0f;
+        if (axis_data.count(PS3_AxisId::LEFT_REAR_2))
+          angular_velocity_z -= (axis_data[PS3_AxisId::LEFT_REAR_2] + 1.0f) / 2.0f;
+        if (axis_data.count(PS3_AxisId::RIGHT_REAR_2))
+          angular_velocity_z += (axis_data[PS3_AxisId::RIGHT_REAR_2] + 1.0f) / 2.0f;
+
+        twist_msg.linear.x  = linear_velocity_x;
+        twist_msg.linear.y  = linear_velocity_y;
         twist_msg.linear.z  = 0.0;
 
-        twist_msg.angular.x = pitch;
-        twist_msg.angular.y = yaw;
-        twist_msg.angular.z = angular_z;
+        twist_msg.angular.x = angular_velocity_head_tilt;
+        twist_msg.angular.y = angular_velocity_head_pan;
+        twist_msg.angular.z = angular_velocity_z;
 
         cmd_vel_pub.publish(twist_msg);
       }
