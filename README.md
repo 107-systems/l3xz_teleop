@@ -1,6 +1,7 @@
 <a href="https://107-systems.org/"><img align="right" src="https://raw.githubusercontent.com/107-systems/.github/main/logo/107-systems.png" width="15%"></a>
 :floppy_disk: `l3xz_teleop`
 ===========================
+Teleoperation for L3X-Z via PS3 joystick and ROS topics.
 
 ### How-to-build
 ```bash
@@ -29,13 +30,13 @@ Right joystick:
 * Left/Right -> Pose of sensor head: left/right -90° to +90°.
 
 ### Interface Documentation
-#### Topics
+#### Published Topics
 | Default name | Type |
 |:-:|:-:|
 | `/l3xz/cmd_vel` | [`geometry_msgs/Twist`](https://docs.ros.org/en/noetic/api/geometry_msgs/html/msg/Twist.html) |
 
 #### Parameters
 | Name | Default | Description |
-|:-:|:-:|:-:|
+|:-:|:-:|-|
 | `joy_dev_node` | `/dev/input/js0` | Name of input device node under which joystick is registed in Linux. |
-| `topic_robot_velocity` | `cmd_vel` | Name of topic for controlling L3X-Z foward/sideways/angular speed (linear.x/y, angular.z) |
+| `topic_robot_velocity` | `cmd_vel` | Name of topic for controlling L3X-Z foward/sideways/angular speed (linear.x/y, angular.z) as well as the sensor head. |
