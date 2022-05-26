@@ -125,9 +125,15 @@ int main(int argc, char **argv)
   }
   catch (std::runtime_error const & err)
   {
-    ROS_ERROR("%s", err.what());
+    ROS_ERROR("Exception (std::runtime_error) caught: %s\nTerminating ...", err.what());
     return EXIT_FAILURE;
   }
+  catch (...)
+  {
+    ROS_ERROR("Unhandled exception caught.\nTerminating ...");
+    return EXIT_FAILURE;
+  }
+
 
   return EXIT_SUCCESS;
 }
