@@ -14,11 +14,8 @@
 #include <limits>
 #include <numeric>
 
-#include <ros/ros.h>
-#include <ros/console.h>
-
-#include <geometry_msgs/Twist.h>
-#include <geometry_msgs/Quaternion.h>
+#include <geometry_msgs/msg/twist.hpp>
+#include <geometry_msgs/msg/quaternion.hpp>
 
 #include <tf2/LinearMath/Quaternion.h>
 #include <tf2_geometry_msgs/tf2_geometry_msgs.h>
@@ -26,10 +23,28 @@
 #include <l3xz_teleop/Joystick.h>
 #include <l3xz_teleop/PS3_Const.h>
 
+#include <chrono>
+#include <functional>
+#include <memory>
+#include <string>
+
+#include "rclcpp/rclcpp.hpp"
+#include "std_msgs/msg/string.hpp"
+
+using namespace std::chrono_literals;
+using std::placeholders::_1;
+
+
+int main(int argc, char * argv[])
+{
+  rclcpp::init(argc, argv);
+  rclcpp::shutdown();
+  return 0;
+}
 /**************************************************************************************
  * MAIN
  **************************************************************************************/
-
+/*
 int main(int argc, char **argv)
 {
   ros::init(argc, argv, "teleop_node");
@@ -55,10 +70,8 @@ int main(int argc, char **argv)
 
     for (auto prev = std::chrono::steady_clock::now(); ros::ok(); )
     {
-      /* Read data from the joystick and pre-process it. */
       std::optional<JoystickEvent> const evt = joystick.update();
 
-      /* Process the received event. */
       if (evt)
       {
         if (evt.value().isInit())
@@ -79,7 +92,6 @@ int main(int argc, char **argv)
         }
       }
 
-      /* Transmit control messages at a defined interval. */
       auto const now = std::chrono::steady_clock::now();
       auto const elapsed = (now - prev);
 
@@ -136,4 +148,4 @@ int main(int argc, char **argv)
 
 
   return EXIT_SUCCESS;
-}
+}*/
