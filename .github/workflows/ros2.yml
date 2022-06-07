@@ -24,7 +24,7 @@ jobs:
     
     - name: Setup ros2 workspace
       run: | 
-        source /opt/ros/galactic/setup.bash
+        source /opt/ros/${{ matrix.ros_distro }}/setup.bash
         mkdir -p ${{github.workspace}}/ros2_ws/src
         cd ${{github.workspace}}/ros2_ws
         colcon build
