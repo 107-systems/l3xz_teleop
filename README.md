@@ -6,17 +6,17 @@ Teleoperation for L3X-Z via PS3 joystick and ROS topics.
 
 ### How-to-build
 ```bash
-# Clone this repository into catkin_ws/src.
+# Clone this repository
 git clone https://github.com/107-systems/l3xz_teleop
-# Invoke catkin_make from the catkin workspace root.
-source /opt/ros/noetic/setup.bash
-catkin_make
+# Invoke colcon build from repository root root.
+source /opt/ros/galacti/setup.bash
+colcon build
 ```
 
 ### How-to-run
 ```bash
-source devel/setup.bash
-roslaunch l3xz_teleop joy.launch
+source install/setup.bash
+ros2 launch l3xz_teleop joy.py
 ```
 
 ### PS3 Control Description
