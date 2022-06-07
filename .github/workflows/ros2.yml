@@ -13,9 +13,7 @@ jobs:
   build:
     name: Build on ros2 ${{ matrix.ros_distro }}
     #runs-on: ubuntu-20.04
-    runs:
-      using: 'docker'
-      image: 'osrf/ros:galactic-desktop'
+    runs-on: osrf/ros:galactic-desktop
     strategy:
       matrix:
         ros_distro: [galactic]
