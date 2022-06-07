@@ -11,16 +11,16 @@ env:
 
 jobs:
   build:
-    name: Build on ros2 galactic 
+    name: Build on ros2 ${{ matrix.ros_distro }}
     runs-on: ubuntu-20.04
     strategy:
       matrix:
-        ros_distro: galactic
+        ros_distro: [foxy, galactic]
 
     steps:   
     - uses: ros-tooling/setup-ros@v0.2
       with:
-        required-ros-distributions: galactic 
+        required-ros-distributions: ${{ matrix.ros_distro }}
     
     - name: Setup ros2 workspace
       run: | 
