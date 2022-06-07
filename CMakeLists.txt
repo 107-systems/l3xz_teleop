@@ -25,6 +25,11 @@ ament_target_dependencies(${PROJECT_NAME}_node rclcpp std_msgs geometry_msgs tf2
 install(TARGETS
   ${PROJECT_NAME}_node
   DESTINATION lib/${PROJECT_NAME})
+
+install(DIRECTORY
+  launch
+  DESTINATION share/${PROJECT_NAME}
+)
 #######################################################################################
 ament_package()
 #######################################################################################
