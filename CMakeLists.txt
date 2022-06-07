@@ -20,6 +20,7 @@ add_executable(${PROJECT_NAME}_node
   src/node.cpp
 )
 #######################################################################################
+target_compile_features(${PROJECT_NAME}_node PRIVATE cxx_std_17)
 ament_target_dependencies(${PROJECT_NAME}_node rclcpp std_msgs geometry_msgs tf2)
 #######################################################################################
 install(TARGETS
