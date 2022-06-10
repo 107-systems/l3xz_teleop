@@ -14,6 +14,8 @@
 #include <limits>
 #include <numeric>
 
+#include <rclcpp/rclcpp.hpp>
+#include <std_msgs/msg/string.hpp>
 #include <geometry_msgs/msg/twist.hpp>
 #include <geometry_msgs/msg/quaternion.hpp>
 
@@ -27,9 +29,6 @@
 #include <functional>
 #include <memory>
 #include <string>
-
-#include "rclcpp/rclcpp.hpp"
-#include "std_msgs/msg/string.hpp"
 
 using namespace std::chrono_literals;
 using std::placeholders::_1;
