@@ -129,7 +129,9 @@ class TeleopNode : public rclcpp::Node
 int main(int argc, char * argv[])
 {
   rclcpp::init(argc, argv);
+
   std::shared_ptr<TeleopNode> node = std::make_shared<TeleopNode>();
+
   try
   {
     while(rclcpp::ok())
@@ -137,6 +139,9 @@ int main(int argc, char * argv[])
       node->update();
       rclcpp::spin_some(node);
     }
+
+    rclcpp::shutdown();
+    return EXIT_SUCCESS;
   }
   catch (std::runtime_error const & err)
   {
@@ -146,8 +151,6 @@ int main(int argc, char * argv[])
   catch (...)
   {
     RCLCPP_ERROR(rclcpp::get_logger(node->get_name()), "Unhandled exception caught.\nTerminating ...");
-    return(EXIT_FAILURE);
+    return EXIT_FAILURE;
   }
-  rclcpp::shutdown();
-  return 0;
 }
