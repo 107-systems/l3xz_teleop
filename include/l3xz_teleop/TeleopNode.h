@@ -31,9 +31,9 @@ private:
   rclcpp::Publisher<geometry_msgs::msg::Twist>::SharedPtr _publisher;
   rclcpp::TimerBase::SharedPtr _pub_timer;
   geometry_msgs::msg::Twist _twist_msg;
-  std::map<PS3_AxisId, float> _axis_data;
 
   std::shared_ptr<Joystick> _joystick;
+  std::map<PS3_AxisId, float> _joystick_data;
   std::thread _joy_thread;
   std::atomic<bool> _joy_thread_active;
 

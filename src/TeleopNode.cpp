@@ -72,7 +72,7 @@ void TeleopNode::joystick_thread_func()
 
       PS3_AxisId const axis_id = static_cast<PS3_AxisId>(evt.number);
       float const axis_scaled_val = static_cast<float>(evt.value) / static_cast<float>(std::numeric_limits<int16_t>::max());
-      _axis_data[axis_id] = axis_scaled_val;
+      _joystick_data[axis_id] = axis_scaled_val;
     }
 
     if (evt.isButton()) {
@@ -84,26 +84,26 @@ void TeleopNode::joystick_thread_func()
 void TeleopNode::pub_timer_callback()
 {
   float linear_velocity_x = _twist_msg.linear.x;
-  if (_axis_data.count(PS3_AxisId::LEFT_STICK_VERTICAL))
-    linear_velocity_x = -1.0f * _axis_data[PS3_AxisId::LEFT_STICK_VERTICAL];
+  if (_joystick_data.count(PS3_AxisId::LEFT_STICK_VERTICAL))
+    linear_velocity_x = -1.0f * _joystick_data[PS3_AxisId::LEFT_STICK_VERTICAL];
 
   float linear_velocity_y = _twist_msg.linear.y;
-  if (_axis_data.count(PS3_AxisId::LEFT_STICK_HORIZONTAL))
-    linear_velocity_y = _axis_data[PS3_AxisId::LEFT_STICK_HORIZONTAL];
+  if (_joystick_data.count(PS3_AxisId::LEFT_STICK_HORIZONTAL))
+    linear_velocity_y = _joystick_data[PS3_AxisId::LEFT_STICK_HORIZONTAL];
 
   float angular_velocity_head_tilt = _twist_msg.angular.x;
-  if (_axis_data.count(PS3_AxisId::RIGHT_STICK_VERTICAL))
-    angular_velocity_head_tilt = -1.0f * _axis_data[PS3_AxisId::RIGHT_STICK_VERTICAL];
+  if (_joystick_data.count(PS3_AxisId::RIGHT_STICK_VERTICAL))
+    angular_velocity_head_tilt = -1.0f * _joystick_data[PS3_AxisId::RIGHT_STICK_VERTICAL];
 
   float angular_velocity_head_pan = _twist_msg.angular.y;
-  if (_axis_data.count(PS3_AxisId::RIGHT_STICK_HORIZONTAL))
-    angular_velocity_head_pan = _axis_data[PS3_AxisId::RIGHT_STICK_HORIZONTAL];
+  if (_joystick_data.count(PS3_AxisId::RIGHT_STICK_HORIZONTAL))
+    angular_velocity_head_pan = _joystick_data[PS3_AxisId::RIGHT_STICK_HORIZONTAL];
 
   float angular_velocity_z = 0.0f;
-  if (_axis_data.count(PS3_AxisId::LEFT_REAR_2))
-    angular_velocity_z -= (_axis_data[PS3_AxisId::LEFT_REAR_2] + 1.0f) / 2.0f;
-  if (_axis_data.count(PS3_AxisId::RIGHT_REAR_2))
-    angular_velocity_z += (_axis_data[PS3_AxisId::RIGHT_REAR_2] + 1.0f) / 2.0f;
+  if (_joystick_data.count(PS3_AxisId::LEFT_REAR_2))
+    angular_velocity_z -= (_joystick_data[PS3_AxisId::LEFT_REAR_2] + 1.0f) / 2.0f;
+  if (_joystick_data.count(PS3_AxisId::RIGHT_REAR_2))
+    angular_velocity_z += (_joystick_data[PS3_AxisId::RIGHT_REAR_2] + 1.0f) / 2.0f;
 
   _twist_msg.linear.x  = linear_velocity_x;
   _twist_msg.linear.y  = linear_velocity_y;
