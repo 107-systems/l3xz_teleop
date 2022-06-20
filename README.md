@@ -23,7 +23,7 @@ Check the content of the published message via:
 ```bash
 ros2 topic list
 /* ... */
-echo /cmd_vel
+echo /l3xz/cmd_vel
 ```
 
 ### PS3 Control Description
