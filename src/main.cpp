@@ -23,10 +23,7 @@ int main(int argc, char * argv[])
   try
   {
     while(rclcpp::ok())
-    {
-      node->update();
-      rclcpp::spin_some(node);
-    }
+      rclcpp::spin(node);
 
     rclcpp::shutdown();
     return EXIT_SUCCESS;

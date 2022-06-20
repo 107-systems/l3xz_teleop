@@ -24,17 +24,19 @@
 class TeleopNode : public rclcpp::Node
 {
 public:
-  TeleopNode();
-
-  void update();
+   TeleopNode();
+  ~TeleopNode();
 
 private:
   rclcpp::Publisher<geometry_msgs::msg::Twist>::SharedPtr _publisher;
   rclcpp::TimerBase::SharedPtr _pub_timer;
-  std::shared_ptr<Joystick> _joystick;
   geometry_msgs::msg::Twist _twist_msg;
   std::map<PS3_AxisId, float> _axis_data;
 
-  void update_joystick();
+  std::shared_ptr<Joystick> _joystick;
+  std::thread _joy_thread;
+  std::atomic<bool> _joy_thread_active;
+
+  void joystick_thread_func();
   void pub_timer_callback();
 };
