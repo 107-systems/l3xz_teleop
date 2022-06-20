@@ -18,13 +18,11 @@ int main(int argc, char * argv[])
 {
   rclcpp::init(argc, argv);
 
-  std::shared_ptr<TeleopNode> node = std::make_shared<TeleopNode>();
+  auto node = std::make_shared<TeleopNode>();
 
   try
   {
-    while(rclcpp::ok())
-      rclcpp::spin(node);
-
+    rclcpp::spin(node);
     rclcpp::shutdown();
     return EXIT_SUCCESS;
   }
