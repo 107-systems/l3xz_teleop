@@ -18,6 +18,7 @@ include_directories(
 add_executable(${PROJECT_NAME}_node
   src/Joystick.cpp
   src/node.cpp
+  src/TeleopNode.cpp
 )
 #######################################################################################
 target_compile_features(${PROJECT_NAME}_node PRIVATE cxx_std_17)
