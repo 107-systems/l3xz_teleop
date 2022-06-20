@@ -20,6 +20,7 @@ add_executable(${PROJECT_NAME}_node
 )
 #######################################################################################
 target_compile_features(${PROJECT_NAME}_node PRIVATE cxx_std_17)
+target_compile_options(${PROJECT_NAME}_node PRIVATE -Wall -Werror -pedantic)
 ament_target_dependencies(${PROJECT_NAME}_node rclcpp std_msgs geometry_msgs)
 #######################################################################################
 install(TARGETS
