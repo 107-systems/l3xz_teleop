@@ -48,10 +48,10 @@ class TeleopNode : public rclcpp::Node
         } ()
       }
     {
-      this->declare_parameter("joy_dev_node", "/dev/input/js0");
-      this->declare_parameter("topic_robot_velocity", "cmd_vel");
-      _joystick = std::make_shared<Joystick>(this->get_parameter("joy_dev_node").as_string());
-      _publisher = this->create_publisher<geometry_msgs::msg::Twist>(this->get_parameter("topic_robot_velocity").as_string(), 25);
+      declare_parameter("joy_dev_node", "/dev/input/js0");
+      declare_parameter("topic_robot_velocity", "cmd_vel");
+      _joystick = std::make_shared<Joystick>(get_parameter("joy_dev_node").as_string());
+      _publisher = create_publisher<geometry_msgs::msg::Twist>(get_parameter("topic_robot_velocity").as_string(), 25);
     }
 
     void update()
@@ -71,7 +71,7 @@ class TeleopNode : public rclcpp::Node
         }
         else if (evt.value().isAxis())
         {
-          RCLCPP_INFO(this->get_logger(), "Axis %d: %d", evt.value().number, evt.value().value);
+          RCLCPP_INFO(get_logger(), "Axis %d: %d", evt.value().number, evt.value().value);
 
           PS3_AxisId const axis_id = static_cast<PS3_AxisId>(evt.value().number);
           float const axis_scaled_val = static_cast<float>(evt.value().value) / static_cast<float>(std::numeric_limits<int16_t>::max());
@@ -80,7 +80,7 @@ class TeleopNode : public rclcpp::Node
 
         if (evt.value().isButton())
         {
-          RCLCPP_INFO(this->get_logger(), "Button %d: %d", evt.value().number, evt.value().value);
+          RCLCPP_INFO(get_logger(), "Button %d: %d", evt.value().number, evt.value().value);
         }
 
         auto const now = std::chrono::steady_clock::now();
@@ -119,7 +119,7 @@ class TeleopNode : public rclcpp::Node
           _twist_msg.angular.y = angular_velocity_head_pan;
           _twist_msg.angular.z = angular_velocity_z;
 
-          this->_publisher->publish(_twist_msg);
+          _publisher->publish(_twist_msg);
         }
       }
     }
