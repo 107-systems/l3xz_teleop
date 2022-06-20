@@ -22,7 +22,7 @@
  **************************************************************************************/
 
 Joystick::Joystick(std::string const & dev_node)
-: _fd{open(dev_node.c_str(), O_RDONLY | O_NONBLOCK)}
+: _fd{open(dev_node.c_str(), O_RDONLY)}
 {
 
 }
@@ -36,18 +36,13 @@ Joystick::~Joystick()
  * PUBLIC MEMBER FUNCTIONS
  **************************************************************************************/
 
-std::optional<JoystickEvent> Joystick::update()
+JoystickEvent Joystick::update()
 {
 	JoystickEvent evt;
   
   if (auto const bytes_read = read(_fd, &evt, sizeof(JoystickEvent));
       bytes_read != sizeof(JoystickEvent))
-  {
-    if (errno != EAGAIN) {
-      throw std::runtime_error("Error while reading from joystick: " + std::string(strerror(errno)));
-    }
-    return std::nullopt;
-  }
+    throw std::runtime_error("Error while reading from joystick: " + std::string(strerror(errno)));
 
   return evt;
 }

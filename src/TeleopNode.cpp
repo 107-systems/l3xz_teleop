@@ -61,25 +61,22 @@ void TeleopNode::joystick_thread_func()
 
   while (_joy_thread_active)
   {
-    std::optional<JoystickEvent> const evt = _joystick->update();
+    JoystickEvent const evt = _joystick->update();
 
-    if (!evt.has_value())
+    if (evt.isInit())
       continue;
 
-    if (evt.value().isInit())
-      continue;
-
-    if (evt.value().isAxis())
+    if (evt.isAxis())
     {
-      RCLCPP_INFO(get_logger(), "Axis %d: %d", evt.value().number, evt.value().value);
+      RCLCPP_INFO(get_logger(), "Axis %d: %d", evt.number, evt.value);
 
-      PS3_AxisId const axis_id = static_cast<PS3_AxisId>(evt.value().number);
-      float const axis_scaled_val = static_cast<float>(evt.value().value) / static_cast<float>(std::numeric_limits<int16_t>::max());
+      PS3_AxisId const axis_id = static_cast<PS3_AxisId>(evt.number);
+      float const axis_scaled_val = static_cast<float>(evt.value) / static_cast<float>(std::numeric_limits<int16_t>::max());
       _axis_data[axis_id] = axis_scaled_val;
     }
 
-    if (evt.value().isButton()) {
-      RCLCPP_INFO(get_logger(), "Button %d: %d", evt.value().number, evt.value().value);
+    if (evt.isButton()) {
+      RCLCPP_INFO(get_logger(), "Button %d: %d", evt.number, evt.value);
     }
   }
 }

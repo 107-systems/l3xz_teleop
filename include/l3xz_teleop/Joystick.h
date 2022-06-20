@@ -27,7 +27,7 @@ public:
    Joystick(std::string const & dev_node);
   ~Joystick();
 
-  std::optional<JoystickEvent> update();
+  JoystickEvent update();
 
 private:
   int _fd;
