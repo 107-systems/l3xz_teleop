@@ -116,7 +116,6 @@ class TeleopNode : public rclcpp::Node
     }
   private:
 
-    rclcpp::TimerBase::SharedPtr timer_;
     rclcpp::Publisher<geometry_msgs::msg::Twist>::SharedPtr publisher_;
     std::shared_ptr<Joystick> joystick;
     geometry_msgs::msg::Twist twist_msg;
