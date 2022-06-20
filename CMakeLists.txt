@@ -17,7 +17,7 @@ include_directories(
 #######################################################################################
 add_executable(${PROJECT_NAME}_node
   src/Joystick.cpp
-  src/node.cpp
+  src/main.cpp
   src/TeleopNode.cpp
 )
 #######################################################################################
