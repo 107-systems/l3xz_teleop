@@ -30,9 +30,6 @@
 #include <memory>
 #include <string>
 
-using namespace std::chrono_literals;
-using std::placeholders::_1;
-
 /**************************************************************************************
  * NODE IMPLEMENTATION 
  **************************************************************************************/
