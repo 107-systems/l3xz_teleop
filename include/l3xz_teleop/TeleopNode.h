@@ -9,7 +9,9 @@
  **************************************************************************************/
 
 #include <map>
+#include <mutex>
 #include <memory>
+#include <thread>
 
 #include <rclcpp/rclcpp.hpp>
 #include <geometry_msgs/msg/twist.hpp>
@@ -34,6 +36,7 @@ private:
 
   std::shared_ptr<Joystick> _joystick;
   std::map<PS3_AxisId, float> _joystick_data;
+  std::mutex _joy_mtx;
   std::thread _joy_thread;
   std::atomic<bool> _joy_thread_active;
 
