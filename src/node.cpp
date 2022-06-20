@@ -34,6 +34,19 @@ class TeleopNode : public rclcpp::Node
   public:
     TeleopNode()
     : Node("teleop")
+    , _twist_msg{
+        []()
+        {
+          geometry_msgs::msg::Twist msg;
+          msg.linear.x  = 0.0;
+          msg.linear.y  = 0.0;
+          msg.linear.z  = 0.0;
+          msg.angular.x = 0.0;
+          msg.angular.y = 0.0;
+          msg.angular.z = 0.0;
+          return msg;
+        } ()
+      }
     {
       this->declare_parameter("joy_dev_node", "/dev/input/js0");
       this->declare_parameter("topic_robot_velocity", "cmd_vel");
