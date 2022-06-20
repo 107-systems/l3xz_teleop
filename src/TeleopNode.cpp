@@ -38,6 +38,8 @@ TeleopNode::TeleopNode()
   declare_parameter("topic_robot_velocity", "cmd_vel");
   _joystick = std::make_shared<Joystick>(get_parameter("joy_dev_node").as_string());
   _publisher = create_publisher<geometry_msgs::msg::Twist>(get_parameter("topic_robot_velocity").as_string(), 25);
+  _pub_timer = create_wall_timer(std::chrono::milliseconds(50), [this]() { this->pub_timer_callback(); });
+
 }
 
 /**************************************************************************************
@@ -47,14 +49,6 @@ TeleopNode::TeleopNode()
 void TeleopNode::update()
 {
   update_joystick();
-
-  static auto prev = std::chrono::steady_clock::now();
-  auto const now = std::chrono::steady_clock::now();
-
-  if ((now - prev) > std::chrono::milliseconds(50)) {
-    prev = now;
-    update_ros();
-  }
 }
 
 /**************************************************************************************
@@ -86,7 +80,7 @@ void TeleopNode::update_joystick()
   }
 }
 
-void TeleopNode::update_ros()
+void TeleopNode::pub_timer_callback()
 {
   float linear_velocity_x = _twist_msg.linear.x;
   if (_axis_data.count(PS3_AxisId::LEFT_STICK_VERTICAL))

@@ -30,10 +30,11 @@ public:
 
 private:
   rclcpp::Publisher<geometry_msgs::msg::Twist>::SharedPtr _publisher;
+  rclcpp::TimerBase::SharedPtr _pub_timer;
   std::shared_ptr<Joystick> _joystick;
   geometry_msgs::msg::Twist _twist_msg;
   std::map<PS3_AxisId, float> _axis_data;
 
   void update_joystick();
-  void update_ros();
+  void pub_timer_callback();
 };
