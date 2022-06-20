@@ -7,9 +7,9 @@ Teleoperation for L3X-Z via PS3 joystick and ROS topics.
 
 ### How-to-build
 ```bash
-# Clone this repository
+# Clone this repository.
 git clone https://github.com/107-systems/l3xz_teleop
-# Invoke colcon build from repository root root.
+# Invoke 'colcon build' from repository root.
 source /opt/ros/galactic/setup.bash
 colcon build
 ```
