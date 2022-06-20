@@ -11,6 +11,7 @@
 #include <map>
 #include <string>
 #include <chrono>
+#include <memory>
 #include <limits>
 #include <numeric>
 
@@ -24,11 +25,6 @@
 
 #include <l3xz_teleop/Joystick.h>
 #include <l3xz_teleop/PS3_Const.h>
-
-#include <chrono>
-#include <functional>
-#include <memory>
-#include <string>
 
 /**************************************************************************************
  * NODE IMPLEMENTATION 
