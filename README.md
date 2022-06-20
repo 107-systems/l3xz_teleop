@@ -1,21 +1,29 @@
 <a href="https://107-systems.org/"><img align="right" src="https://raw.githubusercontent.com/107-systems/.github/main/logo/107-systems.png" width="15%"></a>
 :floppy_disk: `l3xz_teleop`
 ===========================
+[![Build Status](https://github.com/107-systems/l3xz_teleop/actions/workflows/ros2.yml/badge.svg)](https://github.com/107-systems/l3xz_teleop/actions/workflows/ros2.yml)
+
 Teleoperation for L3X-Z via PS3 joystick and ROS topics.
 
 ### How-to-build
 ```bash
-# Clone this repository into catkin_ws/src.
+# Clone this repository.
 git clone https://github.com/107-systems/l3xz_teleop
-# Invoke catkin_make from the catkin workspace root.
-source /opt/ros/noetic/setup.bash
-catkin_make
+# Invoke 'colcon build' from repository root.
+source /opt/ros/galactic/setup.bash
+colcon build
 ```
 
 ### How-to-run
 ```bash
-source devel/setup.bash
-roslaunch l3xz_teleop joy.launch
+source install/setup.bash
+ros2 launch l3xz_teleop joy.py
+```
+Check the content of the published message via:
+```bash
+ros2 topic list
+/* ... */
+echo /l3xz/cmd_vel
 ```
 
 ### PS3 Control Description
@@ -33,7 +41,7 @@ Right joystick:
 #### Published Topics
 | Default name | Type |
 |:-:|:-:|
-| `/l3xz/cmd_vel` | [`geometry_msgs/Twist`](https://docs.ros.org/en/noetic/api/geometry_msgs/html/msg/Twist.html) |
+| `/cmd_vel` | [`geometry_msgs/Twist`](https://docs.ros.org/en/noetic/api/geometry_msgs/html/msg/Twist.html) |
 
 #### Parameters
 | Name | Default | Description |
