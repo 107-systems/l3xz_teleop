@@ -19,6 +19,12 @@ colcon build
 source install/setup.bash
 ros2 launch l3xz_teleop joy.py
 ```
+Check the content of the published message via:
+```bash
+ros2 topic list
+/* ... */
+echo /cmd_vel
+```
 
 ### PS3 Control Description
 Left joystick:
