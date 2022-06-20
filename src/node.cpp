@@ -44,18 +44,21 @@ class TeleopNode : public rclcpp::Node
     {
       this->declare_parameter("joy_dev_node", "/dev/input/js0");
       this->declare_parameter("topic_robot_velocity", "cmd_vel");
-      joystick = std::make_shared<Joystick>(this->get_parameter("joy_dev_node").as_string());
-      publisher_ = this->create_publisher<geometry_msgs::msg::Twist>(this->get_parameter("topic_robot_velocity").as_string(), 25);
+      _joystick = std::make_shared<Joystick>(this->get_parameter("joy_dev_node").as_string());
+      _publisher = this->create_publisher<geometry_msgs::msg::Twist>(this->get_parameter("topic_robot_velocity").as_string(), 25);
     }
 
     void update()
     {
       static bool initialized = false;
       static auto prev = std::chrono::steady_clock::now();
-      std::optional<JoystickEvent> const evt = joystick->update();
+
+      std::optional<JoystickEvent> const evt = _joystick->update();
 
       if (evt)
       {
+        std::map<PS3_AxisId, float> axis_data;
+
         if (!initialized)
         {
           initialized = evt.value().isInit();
@@ -80,19 +83,19 @@ class TeleopNode : public rclcpp::Node
         if (elapsed > std::chrono::milliseconds(50))
         {
           prev = now;
-          float linear_velocity_x = twist_msg.linear.x;
+          float linear_velocity_x = _twist_msg.linear.x;
           if (axis_data.count(PS3_AxisId::LEFT_STICK_VERTICAL))
             linear_velocity_x = -1.0f * axis_data[PS3_AxisId::LEFT_STICK_VERTICAL];
 
-          float linear_velocity_y = twist_msg.linear.y;
+          float linear_velocity_y = _twist_msg.linear.y;
           if (axis_data.count(PS3_AxisId::LEFT_STICK_HORIZONTAL))
             linear_velocity_y = axis_data[PS3_AxisId::LEFT_STICK_HORIZONTAL];
 
-          float angular_velocity_head_tilt = twist_msg.angular.x;
+          float angular_velocity_head_tilt = _twist_msg.angular.x;
           if (axis_data.count(PS3_AxisId::RIGHT_STICK_VERTICAL))
             angular_velocity_head_tilt = -1.0f * axis_data[PS3_AxisId::RIGHT_STICK_VERTICAL];
 
-          float angular_velocity_head_pan = twist_msg.angular.y;
+          float angular_velocity_head_pan = _twist_msg.angular.y;
           if (axis_data.count(PS3_AxisId::RIGHT_STICK_HORIZONTAL))
             angular_velocity_head_pan = axis_data[PS3_AxisId::RIGHT_STICK_HORIZONTAL];
 
@@ -102,24 +105,23 @@ class TeleopNode : public rclcpp::Node
           if (axis_data.count(PS3_AxisId::RIGHT_REAR_2))
             angular_velocity_z += (axis_data[PS3_AxisId::RIGHT_REAR_2] + 1.0f) / 2.0f;
 
-          twist_msg.linear.x  = linear_velocity_x;
-          twist_msg.linear.y  = linear_velocity_y;
-          twist_msg.linear.z  = 0.0;
+          _twist_msg.linear.x  = linear_velocity_x;
+          _twist_msg.linear.y  = linear_velocity_y;
+          _twist_msg.linear.z  = 0.0;
 
-          twist_msg.angular.x = angular_velocity_head_tilt;
-          twist_msg.angular.y = angular_velocity_head_pan;
-          twist_msg.angular.z = angular_velocity_z;
+          _twist_msg.angular.x = angular_velocity_head_tilt;
+          _twist_msg.angular.y = angular_velocity_head_pan;
+          _twist_msg.angular.z = angular_velocity_z;
 
-          this->publisher_->publish(twist_msg);
+          this->_publisher->publish(_twist_msg);
         }
       }
     }
   private:
 
-    rclcpp::Publisher<geometry_msgs::msg::Twist>::SharedPtr publisher_;
-    std::shared_ptr<Joystick> joystick;
-    geometry_msgs::msg::Twist twist_msg;
-    std::map<PS3_AxisId, float> axis_data;
+    rclcpp::Publisher<geometry_msgs::msg::Twist>::SharedPtr _publisher;
+    std::shared_ptr<Joystick> _joystick;
+    geometry_msgs::msg::Twist _twist_msg;
 };
 
 /**************************************************************************************
