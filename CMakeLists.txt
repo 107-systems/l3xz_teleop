@@ -32,7 +32,7 @@ rosidl_generate_interfaces(${PROJECT_NAME}
 rosidl_target_interfaces(${L3XZ_TELEOP_TARGET} ${PROJECT_NAME} "rosidl_typesupport_cpp")
 #######################################################################################
 install(TARGETS
-  ${L3XZ_CTRL_TARGET}
+  ${L3XZ_TELEOP_TARGET}
   DESTINATION lib/${PROJECT_NAME})
 
 install(DIRECTORY
