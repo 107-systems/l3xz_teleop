@@ -42,7 +42,7 @@ TeleopNode::TeleopNode()
   _teleop_pub = create_publisher<l3xz_teleop::msg::Teleop>
     (get_parameter("topic_robot_velocity").as_string(), 10);
 
-  _pub_timer = create_wall_timer
+  _teleop_pub_timer = create_wall_timer
     (std::chrono::milliseconds(50), [this]() { this->pub_timer_callback(); });
 
   _joystick = std::make_shared<Joystick>(get_parameter("joy_dev_node").as_string());

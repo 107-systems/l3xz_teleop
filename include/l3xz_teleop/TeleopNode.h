@@ -32,7 +32,7 @@ public:
 
 private:
   rclcpp::Publisher<l3xz_teleop::msg::Teleop>::SharedPtr _teleop_pub;
-  rclcpp::TimerBase::SharedPtr _pub_timer;
+  rclcpp::TimerBase::SharedPtr _teleop_pub_timer;
   l3xz_teleop::msg::Teleop _teleop_msg;
 
   std::shared_ptr<Joystick> _joystick;
