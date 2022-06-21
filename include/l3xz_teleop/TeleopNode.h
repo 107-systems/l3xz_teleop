@@ -31,7 +31,7 @@ public:
   ~TeleopNode();
 
 private:
-  rclcpp::Publisher<l3xz_teleop::msg::Teleop>::SharedPtr _publisher;
+  rclcpp::Publisher<l3xz_teleop::msg::Teleop>::SharedPtr _teleop_pub;
   rclcpp::TimerBase::SharedPtr _pub_timer;
   l3xz_teleop::msg::Teleop _teleop_msg;
 
