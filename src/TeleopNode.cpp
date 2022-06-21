@@ -19,7 +19,7 @@
  **************************************************************************************/
 
 TeleopNode::TeleopNode()
-: Node("teleop")
+: Node("l3xz::teleop")
 , _teleop_msg{
     []()
     {
@@ -43,10 +43,10 @@ TeleopNode::TeleopNode()
     (get_parameter("topic_robot_velocity").as_string(), 10);
 
   _teleop_pub_timer = create_wall_timer
-    (std::chrono::milliseconds(50), [this]() { this->pub_timer_callback(); });
+    (std::chrono::milliseconds(50), [this]() { this->teleopTimerCallback(); });
 
-  _joystick = std::make_shared<Joystick>(get_parameter("joy_dev_node").as_string());
-  _joy_thread = std::thread([this]() { this->joystick_thread_func(); });
+  _joystick   = std::make_shared<Joystick>(get_parameter("joy_dev_node").as_string());
+  _joy_thread = std::thread([this]() { this->joystickThreadFunc(); });
 }
 
 TeleopNode::~TeleopNode()
@@ -59,7 +59,7 @@ TeleopNode::~TeleopNode()
  * PRIVATE MEMBER FUNCTIONS
  **************************************************************************************/
 
-void TeleopNode::joystick_thread_func()
+void TeleopNode::joystickThreadFunc()
 {
   _joy_thread_active = true;
 
@@ -87,7 +87,7 @@ void TeleopNode::joystick_thread_func()
   }
 }
 
-void TeleopNode::pub_timer_callback()
+void TeleopNode::teleopTimerCallback()
 {
   {
     std::lock_guard<std::mutex> lock(_joy_mtx);

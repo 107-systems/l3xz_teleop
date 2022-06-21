@@ -41,6 +41,6 @@ private:
   std::thread _joy_thread;
   std::atomic<bool> _joy_thread_active;
 
-  void joystick_thread_func();
-  void pub_timer_callback();
+  void joystickThreadFunc();
+  void teleopTimerCallback();
 };
