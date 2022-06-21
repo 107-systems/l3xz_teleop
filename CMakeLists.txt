@@ -1,30 +1,39 @@
 #######################################################################################
-cmake_minimum_required(VERSION 3.3.0)
+cmake_minimum_required(VERSION 3.8)
 #######################################################################################
 project(l3xz_teleop)
+set(L3XZ_TELEOP_TARGET ${PROJECT_NAME}_node)
+#######################################################################################
+if(CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID MATCHES "Clang")
+  add_compile_options(-Wall -Werror -Wextra -Wpedantic)
+endif()
 #######################################################################################
 find_package(ament_cmake REQUIRED)
 find_package(rclcpp REQUIRED)
-find_package(builtin_interfaces REQUIRED)
-find_package(common_interfaces REQUIRED)
+find_package(rosidl_default_generators REQUIRED)
 find_package(geometry_msgs REQUIRED)
 #######################################################################################
 include_directories(
   include
 )
 #######################################################################################
-add_executable(${PROJECT_NAME}_node
+add_executable(${L3XZ_TELEOP_TARGET}
   src/Joystick.cpp
   src/main.cpp
   src/TeleopNode.cpp
 )
 #######################################################################################
-target_compile_features(${PROJECT_NAME}_node PRIVATE cxx_std_17)
-target_compile_options(${PROJECT_NAME}_node PRIVATE -Wall -Werror -pedantic)
-ament_target_dependencies(${PROJECT_NAME}_node rclcpp std_msgs geometry_msgs)
+target_compile_features(${L3XZ_TELEOP_TARGET} PRIVATE cxx_std_17)
+ament_target_dependencies(${L3XZ_TELEOP_TARGET} rclcpp std_msgs geometry_msgs)
+#######################################################################################
+rosidl_generate_interfaces(${PROJECT_NAME}
+  "msg/Teleop.msg"
+)
+#######################################################################################
+rosidl_target_interfaces(${L3XZ_TELEOP_TARGET} ${PROJECT_NAME} "rosidl_typesupport_cpp")
 #######################################################################################
 install(TARGETS
-  ${PROJECT_NAME}_node
+  ${L3XZ_CTRL_TARGET}
   DESTINATION lib/${PROJECT_NAME})
 
 install(DIRECTORY
