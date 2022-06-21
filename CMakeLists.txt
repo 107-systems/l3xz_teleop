@@ -11,7 +11,6 @@ endif()
 find_package(ament_cmake REQUIRED)
 find_package(rclcpp REQUIRED)
 find_package(rosidl_default_generators REQUIRED)
-find_package(geometry_msgs REQUIRED)
 #######################################################################################
 include_directories(
   include
@@ -24,7 +23,7 @@ add_executable(${L3XZ_TELEOP_TARGET}
 )
 #######################################################################################
 target_compile_features(${L3XZ_TELEOP_TARGET} PRIVATE cxx_std_17)
-ament_target_dependencies(${L3XZ_TELEOP_TARGET} rclcpp std_msgs geometry_msgs)
+ament_target_dependencies(${L3XZ_TELEOP_TARGET} rclcpp)
 #######################################################################################
 rosidl_generate_interfaces(${PROJECT_NAME}
   "msg/Teleop.msg"
