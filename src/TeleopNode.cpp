@@ -20,16 +20,15 @@
 
 TeleopNode::TeleopNode()
 : Node("teleop")
-, _twist_msg{
+, _teleop_msg{
     []()
     {
-      geometry_msgs::msg::Twist msg;
-      msg.linear.x  = 0.0;
-      msg.linear.y  = 0.0;
-      msg.linear.z  = 0.0;
-      msg.angular.x = 0.0;
-      msg.angular.y = 0.0;
-      msg.angular.z = 0.0;
+      l3xz_teleop::msg::Teleop msg;
+      msg.linear_velocity_x          = 0.0f;
+      msg.linear_velocity_y          = 0.0f;
+      msg.angular_velocity_z         = 0.0f;
+      msg.angular_velocity_head_tilt = 0.0f;
+      msg.angular_velocity_head_pan  = 0.0f;
       return msg;
     } ()
   }
@@ -39,7 +38,7 @@ TeleopNode::TeleopNode()
 {
   declare_parameter("joy_dev_node", "/dev/input/js0");
   declare_parameter("topic_robot_velocity", "cmd_vel");
-  _publisher = create_publisher<geometry_msgs::msg::Twist>(get_parameter("topic_robot_velocity").as_string(), 25);
+  _publisher = create_publisher<l3xz_teleop::msg::Teleop>(get_parameter("topic_robot_velocity").as_string(), 10);
   _pub_timer = create_wall_timer(std::chrono::milliseconds(50), [this]() { this->pub_timer_callback(); });
 
   _joystick = std::make_shared<Joystick>(get_parameter("joy_dev_node").as_string());
@@ -86,40 +85,26 @@ void TeleopNode::joystick_thread_func()
 
 void TeleopNode::pub_timer_callback()
 {
-  float linear_velocity_x          = _twist_msg.linear.x;
-  float linear_velocity_y          = _twist_msg.linear.y;
-  float angular_velocity_head_tilt = _twist_msg.angular.x;
-  float angular_velocity_head_pan  = _twist_msg.angular.y;
-  float angular_velocity_z         = 0.0f;
-
   {
     std::lock_guard<std::mutex> lock(_joy_mtx);
 
     if (_joystick_data.count(PS3_AxisId::LEFT_STICK_VERTICAL))
-      linear_velocity_x = -1.0f * _joystick_data[PS3_AxisId::LEFT_STICK_VERTICAL];
+      _teleop_msg.linear_velocity_x = -1.0f * _joystick_data[PS3_AxisId::LEFT_STICK_VERTICAL];
 
     if (_joystick_data.count(PS3_AxisId::LEFT_STICK_HORIZONTAL))
-      linear_velocity_y = _joystick_data[PS3_AxisId::LEFT_STICK_HORIZONTAL];
+      _teleop_msg.linear_velocity_y = _joystick_data[PS3_AxisId::LEFT_STICK_HORIZONTAL];
 
     if (_joystick_data.count(PS3_AxisId::RIGHT_STICK_VERTICAL))
-      angular_velocity_head_tilt = -1.0f * _joystick_data[PS3_AxisId::RIGHT_STICK_VERTICAL];
+      _teleop_msg.angular_velocity_head_tilt = -1.0f * _joystick_data[PS3_AxisId::RIGHT_STICK_VERTICAL];
 
     if (_joystick_data.count(PS3_AxisId::RIGHT_STICK_HORIZONTAL))
-      angular_velocity_head_pan = _joystick_data[PS3_AxisId::RIGHT_STICK_HORIZONTAL];
+      _teleop_msg.angular_velocity_head_pan = _joystick_data[PS3_AxisId::RIGHT_STICK_HORIZONTAL];
 
     if (_joystick_data.count(PS3_AxisId::LEFT_REAR_2))
-      angular_velocity_z -= (_joystick_data[PS3_AxisId::LEFT_REAR_2] + 1.0f) / 2.0f;
+      _teleop_msg.angular_velocity_z -= (_joystick_data[PS3_AxisId::LEFT_REAR_2] + 1.0f) / 2.0f;
     if (_joystick_data.count(PS3_AxisId::RIGHT_REAR_2))
-      angular_velocity_z += (_joystick_data[PS3_AxisId::RIGHT_REAR_2] + 1.0f) / 2.0f;
+      _teleop_msg.angular_velocity_z += (_joystick_data[PS3_AxisId::RIGHT_REAR_2] + 1.0f) / 2.0f;
   }
 
-  _twist_msg.linear.x  = linear_velocity_x;
-  _twist_msg.linear.y  = linear_velocity_y;
-  _twist_msg.linear.z  = 0.0;
-
-  _twist_msg.angular.x = angular_velocity_head_tilt;
-  _twist_msg.angular.y = angular_velocity_head_pan;
-  _twist_msg.angular.z = angular_velocity_z;
-
-  _publisher->publish(_twist_msg);
+  _publisher->publish(_teleop_msg);
 }

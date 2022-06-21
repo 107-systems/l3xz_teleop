@@ -14,7 +14,8 @@
 #include <thread>
 
 #include <rclcpp/rclcpp.hpp>
-#include <geometry_msgs/msg/twist.hpp>
+
+#include <l3xz_teleop/msg/teleop.hpp>
 
 #include "Joystick.h"
 #include "PS3_Const.h"
@@ -30,9 +31,9 @@ public:
   ~TeleopNode();
 
 private:
-  rclcpp::Publisher<geometry_msgs::msg::Twist>::SharedPtr _publisher;
+  rclcpp::Publisher<l3xz_teleop::msg::Teleop>::SharedPtr _publisher;
   rclcpp::TimerBase::SharedPtr _pub_timer;
-  geometry_msgs::msg::Twist _twist_msg;
+  l3xz_teleop::msg::Teleop _teleop_msg;
 
   std::shared_ptr<Joystick> _joystick;
   std::map<PS3_AxisId, float> _joystick_data;
