@@ -52,9 +52,9 @@ TeleopNode::TeleopNode()
   declare_parameter("joy_dev_node", "/dev/input/js0");
   declare_parameter("topic_robot_velocity", "cmd_vel");
   declare_parameter("use_twist_message", false);
-  declare_parameter("x_maxspeed_m/sec", 3.0);
-  declare_parameter("y_maxspeed_m/sec", 3.0);
-  declare_parameter("angular_maxspeed_rad/sec", 1.0);
+  declare_parameter("x_max", 3.0);
+  declare_parameter("y_max", 3.0);
+  declare_parameter("angular_max", 1.0);
 
   _use_twist_msg = get_parameter("use_twist_message").as_bool();
   
@@ -146,13 +146,13 @@ void TeleopNode::publishTwist()
     std::lock_guard<std::mutex> lock(_joy_mtx);
   
     if (_joystick_data.count(PS3_AxisId::LEFT_STICK_VERTICAL))
-      _twist_msg.linear.x = -1.0f * get_parameter("x_maxspeed_m/sec").as_double() * _joystick_data[PS3_AxisId::LEFT_STICK_VERTICAL];
+      _twist_msg.linear.x = -1.0f * get_parameter("x_max").as_double() * _joystick_data[PS3_AxisId::LEFT_STICK_VERTICAL];
 
     if (_joystick_data.count(PS3_AxisId::LEFT_STICK_HORIZONTAL))
-      _twist_msg.linear.y = get_parameter("y_maxspeed_m/sec").as_double() *  _joystick_data[PS3_AxisId::LEFT_STICK_HORIZONTAL];
+      _twist_msg.linear.y = get_parameter("y_max").as_double() *  _joystick_data[PS3_AxisId::LEFT_STICK_HORIZONTAL];
 
     if (_joystick_data.count(PS3_AxisId::RIGHT_STICK_HORIZONTAL))
-      _twist_msg.angular.z = get_parameter("angular_maxspeed_rad/sec").as_double() *  _joystick_data[PS3_AxisId::RIGHT_STICK_HORIZONTAL];
+      _twist_msg.angular.z = get_parameter("angular_max").as_double() *  _joystick_data[PS3_AxisId::RIGHT_STICK_HORIZONTAL];
 
   }
 
