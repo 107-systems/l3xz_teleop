@@ -32,15 +32,42 @@ TeleopNode::TeleopNode()
       return msg;
     } ()
   }
+, _twist_msg{
+    []()
+    {
+      geometry_msgs::msg::Twist msg;
+      msg.linear.x  = 0.0;
+      msg.linear.y  = 0.0;
+      msg.linear.z  = 0.0;
+      msg.angular.x = 0.0;
+      msg.angular.y = 0.0;
+      msg.angular.z = 0.0;
+      return msg;
+    } ()
+  }
 , _joy_mtx{}
 , _joy_thread{}
 , _joy_thread_active{false}
 {
   declare_parameter("joy_dev_node", "/dev/input/js0");
   declare_parameter("topic_robot_velocity", "cmd_vel");
+  declare_parameter("use_twist_message", false);
+  declare_parameter("x_maxspeed_m/sec", 3.0);
+  declare_parameter("y_maxspeed_m/sec", 3.0);
+  declare_parameter("angular_maxspeed_rad/sec", 1.0);
 
-  _teleop_pub = create_publisher<l3xz_teleop::msg::Teleop>
-    (get_parameter("topic_robot_velocity").as_string(), 10);
+  _use_twist_msg = get_parameter("use_twist_message").as_bool();
+  
+  if (_use_twist_msg)
+  {
+    _teleop_twist_pub = create_publisher<geometry_msgs::msg::Twist>
+      (get_parameter("topic_robot_velocity").as_string(), 10);
+  }
+  else
+  {
+    _teleop_pub = create_publisher<l3xz_teleop::msg::Teleop>
+      (get_parameter("topic_robot_velocity").as_string(), 10);
+  }
 
   _teleop_pub_timer = create_wall_timer
     (std::chrono::milliseconds(50), [this]() { this->teleopTimerCallback(); });
@@ -87,11 +114,11 @@ void TeleopNode::joystickThreadFunc()
   }
 }
 
-void TeleopNode::teleopTimerCallback()
+void TeleopNode::publishTeleop()
 {
   {
     std::lock_guard<std::mutex> lock(_joy_mtx);
-
+  
     if (_joystick_data.count(PS3_AxisId::LEFT_STICK_VERTICAL))
       _teleop_msg.linear_velocity_x = -1.0f * _joystick_data[PS3_AxisId::LEFT_STICK_VERTICAL];
 
@@ -111,4 +138,35 @@ void TeleopNode::teleopTimerCallback()
   }
 
   _teleop_pub->publish(_teleop_msg);
+}
+
+void TeleopNode::publishTwist()
+{
+  {
+    std::lock_guard<std::mutex> lock(_joy_mtx);
+  
+    if (_joystick_data.count(PS3_AxisId::LEFT_STICK_VERTICAL))
+      _twist_msg.linear.x = -1.0f * get_parameter("x_maxspeed_m/sec").as_double() * _joystick_data[PS3_AxisId::LEFT_STICK_VERTICAL];
+
+    if (_joystick_data.count(PS3_AxisId::LEFT_STICK_HORIZONTAL))
+      _twist_msg.linear.y = get_parameter("y_maxspeed_m/sec").as_double() *  _joystick_data[PS3_AxisId::LEFT_STICK_HORIZONTAL];
+
+    if (_joystick_data.count(PS3_AxisId::RIGHT_STICK_HORIZONTAL))
+      _twist_msg.angular.z = get_parameter("angular_maxspeed_rad/sec").as_double() *  _joystick_data[PS3_AxisId::RIGHT_STICK_HORIZONTAL];
+
+  }
+
+  _teleop_twist_pub->publish(_twist_msg);
+}
+
+void TeleopNode::teleopTimerCallback()
+{
+  if(_use_twist_msg)
+  {
+    publishTwist();
+  }
+  else
+  {
+    publishTeleop();
+  }
 }
