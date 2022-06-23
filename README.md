@@ -41,7 +41,7 @@ Right joystick:
 #### Published Topics
 | Default name | Type |
 |:-:|:-:|
-| `/cmd_vel` | [`geometry_msgs/Twist`](https://docs.ros.org/en/noetic/api/geometry_msgs/html/msg/Twist.html) |
+| `/cmd_vel` | [`l3xz_ctrl/Teleop`](msg/Teleop.msg) |
 
 #### Parameters
 | Name | Default | Description |
