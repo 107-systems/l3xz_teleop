@@ -23,19 +23,17 @@ Check the content of the published message via:
 ```bash
 ros2 topic list
 /* ... */
-echo /l3xz/cmd_vel
+ros2 topic echo /l3xz/cmd_vel_robot
 ```
 
 ### PS3 Control Description
-Left joystick:
-* Forward/Backward -> Velocity of L3X-Z stepping forward/backward.
-* Left/Right -> Velocity of L3X-Z stepping left/right (sideways).
+| Axis | Button | Description | Mapping |
+|:-:|:-:|-|:-:|
+| Left Stick/Vertical | | Linear velocity of L3X-Z stepping forward/backward. | `linear.x` |
+| Left Stick/Horizontal | | Linear velocity of L3X-Z stepping left/right (sideways). | `linear.y` |
+| Right Stick/Vertical | | Angular velocity of L3X-Z around x-axis. | `angular.x` |
+| Right Stick/Horizontal | | Angular velocity of L3X-Z around z-axis. | `angular.z` |
 
-Left and right rear button/axis number #2 serve for controlling the angular velocity around the Z-axis. Fully pressing the left rear button #2 leads to L3X-Z turning left with maximum possible velocity, fully pressing the right rear button #2 leads to L3X-Z turning right with maximum possible velocity. Pressing both simultaneously they cancel each other out (think of pulling a horse left or right using the rein you hold with both hands).
-
-Right joystick:
-* Forward/Backward -> Pose of sensor head: up/down -90° to +90°.
-* Left/Right -> Pose of sensor head: left/right -90° to +90°.
 
 ### Interface Documentation
 #### Published Topics
