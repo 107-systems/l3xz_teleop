@@ -41,10 +41,11 @@ Right joystick:
 #### Published Topics
 | Default name | Type |
 |:-:|:-:|
-| `/cmd_vel` | [`l3xz_ctrl/Teleop`](msg/Teleop.msg) |
+| `/cmd_vel_robot` | [`geometry_msgs/Twist`](https://docs.ros.org/en/noetic/api/geometry_msgs/html/msg/Twist.html) |
 
 #### Parameters
 | Name | Default | Description |
 |:-:|:-:|-|
 | `joy_dev_node` | `/dev/input/js0` | Name of input device node under which joystick is registed in Linux. |
-| `topic_robot_velocity` | `cmd_vel` | Name of topic for controlling L3X-Z foward/sideways/angular speed (linear.x/y, angular.z) as well as the sensor head. |
+| `topic_robot_stick` | `cmd_vel_robot` | Name of topic for controlling L3X-Z foward/sideways/angular speed (linear.x/y, angular.z). |
+| `topic_robot_pad` | `cmd_vel_head` | Name of topic for controlling L3X-Z sensor head. |

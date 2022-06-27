@@ -51,8 +51,8 @@ TeleopNode::TeleopNode()
 , _joy_thread_active{false}
 {
   declare_parameter("joy_dev_node", "/dev/input/js0");
-  declare_parameter("topic_stick", "cmd_vel");
-  declare_parameter("topic_pad", "cmd_vel_pad");
+  declare_parameter("topic_robot_stick", "cmd_vel");
+  declare_parameter("topic_robot_pad", "cmd_vel_pad");
   declare_parameter("x_max_stick", 3.0);
   declare_parameter("y_max_stick", 3.0);
   declare_parameter("angular_x_max_stick", 1.0);
@@ -61,10 +61,10 @@ TeleopNode::TeleopNode()
   declare_parameter("y_pad", 1.0);
 
   _teleop_stick_pub = create_publisher<geometry_msgs::msg::Twist>
-    (get_parameter("topic_stick").as_string(), 10);
+    (get_parameter("topic_robot_stick").as_string(), 10);
   
   _teleop_pad_pub = create_publisher<geometry_msgs::msg::Twist>
-    (get_parameter("topic_pad").as_string(), 10);
+    (get_parameter("topic_robot_pad").as_string(), 10);
 
   _teleop_pub_timer = create_wall_timer
     (std::chrono::milliseconds(50), [this]() { this->teleopTimerCallback(); });
