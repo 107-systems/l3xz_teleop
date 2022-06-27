@@ -13,12 +13,12 @@ def generate_launch_description():
           {'joy_dev_node': '/dev/input/js0'},
           {'topic_robot_stick': 'cmd_vel_robot'},
           {'topic_robot_pad': 'cmd_vel_head'},
-          {'x_max_stick': 3.0},
-          {'y_max_stick': 3.0},
-          {'angular_x_max_stick': 1.0},
-          {'angular_z_max_stick': 1.0},
-          {'x_pad': 3.0},
-          {'y_pad': 3.0},
+          {'robot_linear_x_max': 3.0},
+          {'robot_linear_y_max': 3.0},
+          {'robot_angular_x_max': 1.0},
+          {'robot_angular_z_max': 1.0},
+          {'head_linear_x_max': 3.0},
+          {'head_linear_y_max': 3.0},
       ]
     )
   ])
