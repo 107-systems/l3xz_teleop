@@ -14,10 +14,8 @@
 #include <thread>
 
 #include <rclcpp/rclcpp.hpp>
+
 #include <geometry_msgs/msg/twist.hpp>
-
-#include <l3xz_teleop/msg/teleop.hpp>
-
 
 #include "Joystick.h"
 #include "PS3_Const.h"
