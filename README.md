@@ -42,6 +42,7 @@ Right joystick:
 | Default name | Type |
 |:-:|:-:|
 | `/cmd_vel_robot` | [`geometry_msgs/Twist`](https://docs.ros.org/en/noetic/api/geometry_msgs/html/msg/Twist.html) |
+| `/cmd_vel_head` | [`geometry_msgs/Twist`](https://docs.ros.org/en/noetic/api/geometry_msgs/html/msg/Twist.html) |
 
 #### Parameters
 | Name | Default | Description |
