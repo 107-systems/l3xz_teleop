@@ -57,8 +57,8 @@ TeleopNode::TeleopNode()
   declare_parameter("robot_linear_y_scale_factor", 3.0);
   declare_parameter("robot_angular_x_scale_factor", 1.0);
   declare_parameter("robot_angular_z_scale_factor", 1.0);
-  declare_parameter("head_linear_x_scale_factor", 1.0);
-  declare_parameter("head_linear_y_scale_factor", 1.0);
+  declare_parameter("head_angular_y_scale_factor", 1.0);
+  declare_parameter("head_angular_z_scale_factor", 1.0);
 
   _teleop_stick_pub = create_publisher<geometry_msgs::msg::Twist>
     (get_parameter("topic_robot_stick").as_string(), 10);
@@ -109,6 +109,7 @@ void TeleopNode::joystickThreadFunc()
       RCLCPP_INFO(get_logger(), "Button %d: %d", evt.number, evt.value);
       
       PS3_ButtonId const button_id = static_cast<PS3_ButtonId>(evt.number);
+
       std::lock_guard<std::mutex> lock(_joy_mtx);
       _button_data[button_id] = static_cast<bool>(evt.value);
     }
@@ -132,19 +133,20 @@ void TeleopNode::teleopTimerCallback()
     if (_joystick_data.count(PS3_AxisId::RIGHT_STICK_HORIZONTAL))
       _msg_stick.angular.z = get_parameter("robot_angular_z_scale_factor").as_double() * _joystick_data[PS3_AxisId::RIGHT_STICK_HORIZONTAL];
 
+
     if (_button_data.count(PS3_ButtonId::PAD_UP) && _button_data[PS3_ButtonId::PAD_UP])
-      _msg_pad.linear.x = get_parameter("head_linear_x_scale_factor").as_double() * static_cast<double>(_button_data[PS3_ButtonId::PAD_UP]);
+      _msg_pad.angular.y = get_parameter("head_angular_y_scale_factor").as_double() * static_cast<double>(_button_data[PS3_ButtonId::PAD_UP]);
     else if (_button_data.count(PS3_ButtonId::PAD_DOWN) && _button_data[PS3_ButtonId::PAD_DOWN])
-      _msg_pad.linear.x = -1.0f * get_parameter("head_linear_x_scale_factor").as_double() * static_cast<double>(_button_data[PS3_ButtonId::PAD_DOWN]);
+      _msg_pad.angular.y = -1.0f * get_parameter("head_angular_y_scale_factor").as_double() * static_cast<double>(_button_data[PS3_ButtonId::PAD_DOWN]);
     else
-      _msg_pad.linear.x = 0.0f;
+      _msg_pad.angular.y = 0.0f;
 
     if (_button_data.count(PS3_ButtonId::PAD_LEFT) && _button_data[PS3_ButtonId::PAD_LEFT])
-      _msg_pad.linear.y = get_parameter("head_linear_y_scale_factor").as_double() * static_cast<double>(_button_data[PS3_ButtonId::PAD_LEFT]);
+      _msg_pad.angular.z = get_parameter("head_angular_z_scale_factor").as_double() * static_cast<double>(_button_data[PS3_ButtonId::PAD_LEFT]);
     else if (_button_data.count(PS3_ButtonId::PAD_RIGHT) && _button_data[PS3_ButtonId::PAD_RIGHT])
-      _msg_pad.linear.y = -1.0f * get_parameter("head_linear_y_scale_factor").as_double() * static_cast<double>(_button_data[PS3_ButtonId::PAD_RIGHT]);
+      _msg_pad.angular.z = -1.0f * get_parameter("head_angular_z_scale_factor").as_double() * static_cast<double>(_button_data[PS3_ButtonId::PAD_RIGHT]);
     else
-      _msg_pad.linear.y = 0.0f;
+      _msg_pad.angular.z = 0.0f;
   }
 
   _teleop_stick_pub->publish(_msg_stick);

@@ -17,8 +17,8 @@ def generate_launch_description():
           {'robot_linear_y_scale_factor': 1.0},
           {'robot_angular_x_scale_factor': 1.0},
           {'robot_angular_z_scale_factor': 1.0},
-          {'head_linear_x_scale_factor': 1.0},
-          {'head_linear_y_scale_factor': 1.0},
+          {'head_angular_y_scale_factor': 1.0},
+          {'head_angular_z_scale_factor': 1.0},
       ]
     )
   ])
