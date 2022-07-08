@@ -2,6 +2,7 @@
 :floppy_disk: `l3xz_teleop`
 ===========================
 [![Build Status](https://github.com/107-systems/l3xz_teleop/actions/workflows/ros2.yml/badge.svg)](https://github.com/107-systems/l3xz_teleop/actions/workflows/ros2.yml)
+[![Spell Check status](https://github.com/107-systems/l3xz_teleop/actions/workflows/spell-check.yml/badge.svg)](https://github.com/107-systems/l3xz_teleop/actions/workflows/spell-check.yml)
 
 Teleoperation for L3X-Z via PS3 joystick and ROS topics.
 
