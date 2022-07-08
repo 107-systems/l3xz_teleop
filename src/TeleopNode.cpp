@@ -20,15 +20,29 @@
 
 TeleopNode::TeleopNode()
 : Node("l3xz_teleop")
-, _teleop_msg{
+,_msg_stick{
     []()
     {
-      l3xz_teleop::msg::Teleop msg;
-      msg.linear_velocity_x          = 0.0f;
-      msg.linear_velocity_y          = 0.0f;
-      msg.angular_velocity_z         = 0.0f;
-      msg.angular_velocity_head_tilt = 0.0f;
-      msg.angular_velocity_head_pan  = 0.0f;
+      geometry_msgs::msg::Twist msg;
+      msg.linear.x  = 0.0;
+      msg.linear.y  = 0.0;
+      msg.linear.z  = 0.0;
+      msg.angular.x = 0.0;
+      msg.angular.y = 0.0;
+      msg.angular.z = 0.0;
+      return msg;
+    } ()
+  }
+, _msg_pad{
+    []()
+    {
+      geometry_msgs::msg::Twist msg;
+      msg.linear.x  = 0.0;
+      msg.linear.y  = 0.0;
+      msg.linear.z  = 0.0;
+      msg.angular.x = 0.0;
+      msg.angular.y = 0.0;
+      msg.angular.z = 0.0;
       return msg;
     } ()
   }
@@ -37,10 +51,20 @@ TeleopNode::TeleopNode()
 , _joy_thread_active{false}
 {
   declare_parameter("joy_dev_node", "/dev/input/js0");
-  declare_parameter("topic_robot_velocity", "cmd_vel");
+  declare_parameter("topic_robot_stick", "cmd_vel");
+  declare_parameter("topic_robot_pad", "cmd_vel_pad");
+  declare_parameter("robot_linear_x_scale_factor", 3.0);
+  declare_parameter("robot_linear_y_scale_factor", 3.0);
+  declare_parameter("robot_angular_x_scale_factor", 1.0);
+  declare_parameter("robot_angular_z_scale_factor", 1.0);
+  declare_parameter("head_angular_y_scale_factor", 1.0);
+  declare_parameter("head_angular_z_scale_factor", 1.0);
 
-  _teleop_pub = create_publisher<l3xz_teleop::msg::Teleop>
-    (get_parameter("topic_robot_velocity").as_string(), 10);
+  _teleop_stick_pub = create_publisher<geometry_msgs::msg::Twist>
+    (get_parameter("topic_robot_stick").as_string(), 10);
+  
+  _teleop_pad_pub = create_publisher<geometry_msgs::msg::Twist>
+    (get_parameter("topic_robot_pad").as_string(), 10);
 
   _teleop_pub_timer = create_wall_timer
     (std::chrono::milliseconds(50), [this]() { this->teleopTimerCallback(); });
@@ -83,6 +107,11 @@ void TeleopNode::joystickThreadFunc()
 
     if (evt.isButton()) {
       RCLCPP_INFO(get_logger(), "Button %d: %d", evt.number, evt.value);
+      
+      PS3_ButtonId const button_id = static_cast<PS3_ButtonId>(evt.number);
+
+      std::lock_guard<std::mutex> lock(_joy_mtx);
+      _button_data[button_id] = static_cast<bool>(evt.value);
     }
   }
 }
@@ -91,24 +120,35 @@ void TeleopNode::teleopTimerCallback()
 {
   {
     std::lock_guard<std::mutex> lock(_joy_mtx);
-
+  
     if (_joystick_data.count(PS3_AxisId::LEFT_STICK_VERTICAL))
-      _teleop_msg.linear_velocity_x = -1.0f * _joystick_data[PS3_AxisId::LEFT_STICK_VERTICAL];
+      _msg_stick.linear.x = -1.0f * get_parameter("robot_linear_x_scale_factor").as_double() * _joystick_data[PS3_AxisId::LEFT_STICK_VERTICAL];
 
     if (_joystick_data.count(PS3_AxisId::LEFT_STICK_HORIZONTAL))
-      _teleop_msg.linear_velocity_y = _joystick_data[PS3_AxisId::LEFT_STICK_HORIZONTAL];
+      _msg_stick.linear.y = get_parameter("robot_linear_y_scale_factor").as_double() * _joystick_data[PS3_AxisId::LEFT_STICK_HORIZONTAL];
 
     if (_joystick_data.count(PS3_AxisId::RIGHT_STICK_VERTICAL))
-      _teleop_msg.angular_velocity_head_tilt = -1.0f * _joystick_data[PS3_AxisId::RIGHT_STICK_VERTICAL];
-
+      _msg_stick.angular.x = get_parameter("robot_angular_x_scale_factor").as_double() * _joystick_data[PS3_AxisId::RIGHT_STICK_VERTICAL];
+    
     if (_joystick_data.count(PS3_AxisId::RIGHT_STICK_HORIZONTAL))
-      _teleop_msg.angular_velocity_head_pan = _joystick_data[PS3_AxisId::RIGHT_STICK_HORIZONTAL];
+      _msg_stick.angular.z = get_parameter("robot_angular_z_scale_factor").as_double() * _joystick_data[PS3_AxisId::RIGHT_STICK_HORIZONTAL];
 
-    if (_joystick_data.count(PS3_AxisId::LEFT_REAR_2))
-      _teleop_msg.angular_velocity_z -= (_joystick_data[PS3_AxisId::LEFT_REAR_2] + 1.0f) / 2.0f;
-    if (_joystick_data.count(PS3_AxisId::RIGHT_REAR_2))
-      _teleop_msg.angular_velocity_z += (_joystick_data[PS3_AxisId::RIGHT_REAR_2] + 1.0f) / 2.0f;
+
+    if (_button_data.count(PS3_ButtonId::PAD_UP) && _button_data[PS3_ButtonId::PAD_UP])
+      _msg_pad.angular.y = get_parameter("head_angular_y_scale_factor").as_double() * static_cast<double>(_button_data[PS3_ButtonId::PAD_UP]);
+    else if (_button_data.count(PS3_ButtonId::PAD_DOWN) && _button_data[PS3_ButtonId::PAD_DOWN])
+      _msg_pad.angular.y = -1.0f * get_parameter("head_angular_y_scale_factor").as_double() * static_cast<double>(_button_data[PS3_ButtonId::PAD_DOWN]);
+    else
+      _msg_pad.angular.y = 0.0f;
+
+    if (_button_data.count(PS3_ButtonId::PAD_LEFT) && _button_data[PS3_ButtonId::PAD_LEFT])
+      _msg_pad.angular.z = get_parameter("head_angular_z_scale_factor").as_double() * static_cast<double>(_button_data[PS3_ButtonId::PAD_LEFT]);
+    else if (_button_data.count(PS3_ButtonId::PAD_RIGHT) && _button_data[PS3_ButtonId::PAD_RIGHT])
+      _msg_pad.angular.z = -1.0f * get_parameter("head_angular_z_scale_factor").as_double() * static_cast<double>(_button_data[PS3_ButtonId::PAD_RIGHT]);
+    else
+      _msg_pad.angular.z = 0.0f;
   }
 
-  _teleop_pub->publish(_teleop_msg);
+  _teleop_stick_pub->publish(_msg_stick);
+  _teleop_pad_pub->publish(_msg_pad);
 }

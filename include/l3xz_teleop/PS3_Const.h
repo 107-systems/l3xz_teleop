@@ -46,6 +46,10 @@ enum PS3_ButtonId : uint8_t
   X,
   SQUARE,
   PS3,
+  PAD_UP = 13,
+  PAD_DOWN = 14,
+  PAD_RIGHT = 15,
+  PAD_LEFT = 16,
 };
 
 #endif /* PS3_CONST_H_ */
