@@ -28,10 +28,10 @@ private:
   rclcpp::Subscription<sensor_msgs::msg::Joy>::SharedPtr _joy_sub;
   sensor_msgs::msg::Joy _joy_msg;
 
-  rclcpp::Publisher<geometry_msgs::msg::Twist>::SharedPtr _teleop_stick_pub;
-  geometry_msgs::msg::Twist _msg_stick;
-  rclcpp::Publisher<geometry_msgs::msg::Twist>::SharedPtr _teleop_pad_pub;
-  geometry_msgs::msg::Twist _msg_pad;
+  rclcpp::Publisher<geometry_msgs::msg::Twist>::SharedPtr _robot_pub;
+  geometry_msgs::msg::Twist _robot_msg;
+  rclcpp::Publisher<geometry_msgs::msg::Twist>::SharedPtr _head_pub;
+  geometry_msgs::msg::Twist _head_msg;
 
   void teleopPubFunc();
 };

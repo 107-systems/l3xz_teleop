@@ -20,7 +20,7 @@
 
 TeleopNode::TeleopNode()
 : Node("l3xz_teleop")
-,_msg_stick{
+, _robot_msg{
     []()
     {
       geometry_msgs::msg::Twist msg;
@@ -33,7 +33,7 @@ TeleopNode::TeleopNode()
       return msg;
     } ()
   }
-, _msg_pad{
+, _head_msg{
     []()
     {
       geometry_msgs::msg::Twist msg;
@@ -54,10 +54,10 @@ TeleopNode::TeleopNode()
   _joy_sub = create_subscription<sensor_msgs::msg::Joy>
     (get_parameter("joy_topic").as_string(), 10, [this](sensor_msgs::msg::Joy const & msg) { _joy_msg = msg; });
 
-  _teleop_stick_pub = create_publisher<geometry_msgs::msg::Twist>
+  _robot_pub = create_publisher<geometry_msgs::msg::Twist>
     (get_parameter("robot_topic").as_string(), 10);
   
-  _teleop_pad_pub = create_publisher<geometry_msgs::msg::Twist>
+  _head_pub = create_publisher<geometry_msgs::msg::Twist>
     (get_parameter("head_topic").as_string(), 10);
 
   _teleop_pub_timer = create_wall_timer
@@ -70,6 +70,6 @@ TeleopNode::TeleopNode()
 
 void TeleopNode::teleopPubFunc()
 {
-  _teleop_stick_pub->publish(_msg_stick);
-  _teleop_pad_pub->publish(_msg_pad);
+  _robot_pub->publish(_robot_msg);
+  _head_pub->publish(_head_msg);
 }
