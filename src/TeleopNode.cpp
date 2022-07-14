@@ -52,10 +52,10 @@ TeleopNode::TeleopNode()
   declare_parameter("head_topic", "cmd_vel_head");
 
   _joy_sub = create_subscription<sensor_msgs::msg::Joy>
-    (get_parameter("joy_topic").as_string(), 10, [this](sensor_msgs::msg::Joy const & msg)
+    (get_parameter("joy_topic").as_string(), 10, [this](sensor_msgs::msg::Joy::SharedPtr const msg)
                                                  {
-                                                   updateRobotMessage(msg);
-                                                   updateHeadMessage (msg);
+                                                   updateRobotMessage(*msg);
+                                                   updateHeadMessage (*msg);
                                                  });
 
   _robot_pub = create_publisher<geometry_msgs::msg::Twist>
