@@ -48,17 +48,17 @@ TeleopNode::TeleopNode()
   }
 {
   declare_parameter("joy_topic", "joy");
-  declare_parameter("topic_robot_stick", "cmd_vel");
-  declare_parameter("topic_robot_pad", "cmd_vel_pad");
+  declare_parameter("robot_topic", "cmd_vel_robot");
+  declare_parameter("head_topic", "cmd_vel_head");
 
   _joy_sub = create_subscription<sensor_msgs::msg::Joy>
     (get_parameter("joy_topic").as_string(), 10, [this](sensor_msgs::msg::Joy const & msg) { _joy_msg = msg; });
 
   _teleop_stick_pub = create_publisher<geometry_msgs::msg::Twist>
-    (get_parameter("topic_robot_stick").as_string(), 10);
+    (get_parameter("robot_topic").as_string(), 10);
   
   _teleop_pad_pub = create_publisher<geometry_msgs::msg::Twist>
-    (get_parameter("topic_robot_pad").as_string(), 10);
+    (get_parameter("head_topic").as_string(), 10);
 
   _teleop_pub_timer = create_wall_timer
     (std::chrono::milliseconds(50), [this]() { this->teleopPubFunc(); });
