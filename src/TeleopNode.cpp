@@ -61,14 +61,14 @@ TeleopNode::TeleopNode()
     (get_parameter("topic_robot_pad").as_string(), 10);
 
   _teleop_pub_timer = create_wall_timer
-    (std::chrono::milliseconds(50), [this]() { this->teleopTimerCallback(); });
+    (std::chrono::milliseconds(50), [this]() { this->teleopPubFunc(); });
 }
 
 /**************************************************************************************
  * PRIVATE MEMBER FUNCTIONS
  **************************************************************************************/
 
-void TeleopNode::teleopTimerCallback()
+void TeleopNode::teleopPubFunc()
 {
   _teleop_stick_pub->publish(_msg_stick);
   _teleop_pad_pub->publish(_msg_pad);

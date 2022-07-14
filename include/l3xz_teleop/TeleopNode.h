@@ -33,5 +33,5 @@ private:
   rclcpp::Publisher<geometry_msgs::msg::Twist>::SharedPtr _teleop_pad_pub;
   geometry_msgs::msg::Twist _msg_pad;
 
-  void teleopTimerCallback();
+  void teleopPubFunc();
 };
