@@ -10,7 +10,6 @@ def generate_launch_description():
       namespace='l3xz',
       output='screen',
       parameters=[
-          {'joy_dev_node': '/dev/input/js0'},
           {'joy_topic': 'joy'},
           {'robot_topic': 'cmd_vel_robot'},
           {'head_topic': 'cmd_vel_head'},
