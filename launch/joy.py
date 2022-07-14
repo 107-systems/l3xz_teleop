@@ -11,6 +11,7 @@ def generate_launch_description():
       output='screen',
       parameters=[
           {'joy_dev_node': '/dev/input/js0'},
+          {'joy_topic': 'joy'},
           {'topic_robot_stick': 'cmd_vel_robot'},
           {'topic_robot_pad': 'cmd_vel_head'},
       ]
