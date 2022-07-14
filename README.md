@@ -18,7 +18,7 @@ colcon build
 ### How-to-run
 ```bash
 source install/setup.bash
-ros2 launch l3xz_teleop joy.py
+ros2 launch l3xz_teleop teleop.py
 ```
 Check the content of the published message via:
 ```bash
