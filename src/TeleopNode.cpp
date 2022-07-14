@@ -52,7 +52,11 @@ TeleopNode::TeleopNode()
   declare_parameter("head_topic", "cmd_vel_head");
 
   _joy_sub = create_subscription<sensor_msgs::msg::Joy>
-    (get_parameter("joy_topic").as_string(), 10, [this](sensor_msgs::msg::Joy const & msg) { _joy_msg = msg; });
+    (get_parameter("joy_topic").as_string(), 10, [this](sensor_msgs::msg::Joy const & msg)
+                                                 {
+                                                   updateRobotMessage(msg);
+                                                   updateHeadMessage (msg);
+                                                 });
 
   _robot_pub = create_publisher<geometry_msgs::msg::Twist>
     (get_parameter("robot_topic").as_string(), 10);
@@ -72,4 +76,16 @@ void TeleopNode::teleopPubFunc()
 {
   _robot_pub->publish(_robot_msg);
   _head_pub->publish(_head_msg);
+}
+
+void TeleopNode::updateRobotMessage(sensor_msgs::msg::Joy const & joy_msg)
+{
+  _robot_msg.linear.x  = (-1.0f) * joy_msg.axes[1]; /* LEFT_STICK_VERTICAL   */
+  _robot_msg.angular.z =           joy_msg.axes[0]; /* LEFT_STICK_HORIZONTAL */
+}
+
+void TeleopNode::updateHeadMessage(sensor_msgs::msg::Joy const & joy_msg)
+{
+  _head_msg.angular.y = (-1.0f) * joy_msg.axes[4]; /* RIGHT_STICK_VERTICAL   */
+  _head_msg.angular.z =           joy_msg.axes[3]; /* RIGHT_STICK_HORIZONTAL */
 }

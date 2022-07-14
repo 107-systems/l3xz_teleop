@@ -26,7 +26,6 @@ private:
   rclcpp::TimerBase::SharedPtr _teleop_pub_timer;
  
   rclcpp::Subscription<sensor_msgs::msg::Joy>::SharedPtr _joy_sub;
-  sensor_msgs::msg::Joy _joy_msg;
 
   rclcpp::Publisher<geometry_msgs::msg::Twist>::SharedPtr _robot_pub;
   geometry_msgs::msg::Twist _robot_msg;
@@ -34,4 +33,7 @@ private:
   geometry_msgs::msg::Twist _head_msg;
 
   void teleopPubFunc();
+
+  void updateRobotMessage(sensor_msgs::msg::Joy const & joy_msg);
+  void updateHeadMessage (sensor_msgs::msg::Joy const & joy_msg);
 };
