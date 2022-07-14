@@ -6,19 +6,17 @@
 
 Teleoperation for L3X-Z via PS3 joystick and ROS topics.
 
-### How-to-build
+#### How-to-build
 ```bash
-# Clone this repository.
-git clone https://github.com/107-systems/l3xz_teleop
-# Invoke 'colcon build' from repository root.
-source /opt/ros/galactic/setup.bash
-colcon build
+colcon_ws/src$ git clone https://github.com/107-systems/l3xz_teleop
+colcon_ws$ source /opt/ros/galactic/setup.bash
+colcon_ws$ colcon build --packages-select l3xz_teleop
 ```
 
-### How-to-run
+#### How-to-run
 ```bash
-source install/setup.bash
-ros2 launch l3xz_teleop teleop.py
+colcon_ws$ source install/setup.bash
+colcon_ws$ ros2 launch l3xz_teleop teleop.py
 ```
 Check the content of the published message via:
 ```bash
@@ -27,25 +25,21 @@ ros2 topic list
 ros2 topic echo /l3xz/cmd_vel_robot
 ```
 
-### PS3 Control Description
-| Axis | Button | Description | Mapping |
-|:-:|:-:|-|:-:|
-| Left Stick/Vertical | | Linear velocity of L3X-Z stepping forward/backward. | `linear.x` |
-| Left Stick/Horizontal | | Linear velocity of L3X-Z stepping left/right (sideways). | `linear.y` |
-| Right Stick/Vertical | | Angular velocity of L3X-Z around x-axis. | `angular.x` |
-| Right Stick/Horizontal | | Angular velocity of L3X-Z around z-axis. | `angular.z` |
-
-
-### Interface Documentation
-#### Published Topics
+#### Interface Documentation
+##### Subscribed Topics
 | Default name | Type |
 |:-:|:-:|
-| `/cmd_vel_robot` | [`geometry_msgs/Twist`](https://docs.ros.org/en/noetic/api/geometry_msgs/html/msg/Twist.html) |
-| `/cmd_vel_head` | [`geometry_msgs/Twist`](https://docs.ros.org/en/noetic/api/geometry_msgs/html/msg/Twist.html) |
+| `/l3xz/joy` | [`sensor_msgs/Joy`](http://docs.ros.org/en/api/sensor_msgs/html/msg/Joy.html) |
 
-#### Parameters
+##### Published Topics
+| Default name | Type |
+|:-:|:-:|
+| `/l3xz/cmd_vel_robot` | [`geometry_msgs/Twist`](http://docs.ros.org/en/api/geometry_msgs/html/msg/Twist.html) |
+| `/l3xz/cmd_vel_head` | [`geometry_msgs/Twist`](http://docs.ros.org/en/api/geometry_msgs/html/msg/Twist.html) |
+
+##### Parameters
 | Name | Default | Description |
 |:-:|:-:|-|
-| `joy_dev_node` | `/dev/input/js0` | Name of input device node under which joystick is registered in Linux. |
-| `topic_robot_stick` | `cmd_vel_robot` | Name of topic for controlling L3X-Z forward/sideways/angular speed (linear.x/y, angular.z). |
-| `topic_robot_pad` | `cmd_vel_head` | Name of topic for controlling L3X-Z sensor head. |
+| `joy_topic` | `joy` | Name of topic from where we are subscribing joystick messages. |
+| `robot_topic` | `cmd_vel_robot` | Name of topic for controlling L3X-Z forward/angular speed (`linear.x`/, `angular.z`). |
+| `head_topic` | `cmd_vel_head` | Name of topic for controlling L3X-Z sensor head (`angular.y`/, `angular.z`). |
