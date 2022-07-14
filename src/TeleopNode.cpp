@@ -50,6 +50,9 @@ TeleopNode::TeleopNode()
   declare_parameter("topic_robot_stick", "cmd_vel");
   declare_parameter("topic_robot_pad", "cmd_vel_pad");
 
+  _joy_sub = create_subscription<sensor_msgs::msg::Joy>
+    ("/l3xz/joy", 10, [this](sensor_msgs::msg::Joy const & msg) { _joy_msg = msg; });
+
   _teleop_stick_pub = create_publisher<geometry_msgs::msg::Twist>
     (get_parameter("topic_robot_stick").as_string(), 10);
   
