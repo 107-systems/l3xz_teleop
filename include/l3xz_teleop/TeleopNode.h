@@ -8,17 +8,10 @@
  * INCLUDE
  **************************************************************************************/
 
-#include <map>
-#include <mutex>
-#include <memory>
-#include <thread>
-
 #include <rclcpp/rclcpp.hpp>
 
+#include <sensor_msgs/msg/joy.hpp>
 #include <geometry_msgs/msg/twist.hpp>
-
-#include "Joystick.h"
-#include "PS3_Const.h"
 
 /**************************************************************************************
  * CLASS DECLARATION
@@ -27,24 +20,20 @@
 class TeleopNode : public rclcpp::Node
 {
 public:
-   TeleopNode();
-  ~TeleopNode();
+  TeleopNode();
 
 private:
   rclcpp::TimerBase::SharedPtr _teleop_pub_timer;
  
-  rclcpp::Publisher<geometry_msgs::msg::Twist>::SharedPtr _teleop_stick_pub;
-  geometry_msgs::msg::Twist _msg_stick;
-  rclcpp::Publisher<geometry_msgs::msg::Twist>::SharedPtr _teleop_pad_pub;
-  geometry_msgs::msg::Twist _msg_pad;
+  rclcpp::Subscription<sensor_msgs::msg::Joy>::SharedPtr _joy_sub;
 
-  std::shared_ptr<Joystick> _joystick;
-  std::map<PS3_AxisId, float> _joystick_data;
-  std::map<PS3_ButtonId, bool> _button_data;
-  std::mutex _joy_mtx;
-  std::thread _joy_thread;
-  std::atomic<bool> _joy_thread_active;
+  rclcpp::Publisher<geometry_msgs::msg::Twist>::SharedPtr _robot_pub;
+  geometry_msgs::msg::Twist _robot_msg;
+  rclcpp::Publisher<geometry_msgs::msg::Twist>::SharedPtr _head_pub;
+  geometry_msgs::msg::Twist _head_msg;
 
-  void joystickThreadFunc();
-  void teleopTimerCallback();
+  void teleopPubFunc();
+
+  void updateRobotMessage(sensor_msgs::msg::Joy const & joy_msg);
+  void updateHeadMessage (sensor_msgs::msg::Joy const & joy_msg);
 };

@@ -20,7 +20,7 @@
 
 TeleopNode::TeleopNode()
 : Node("l3xz_teleop")
-,_msg_stick{
+, _robot_msg{
     []()
     {
       geometry_msgs::msg::Twist msg;
@@ -33,7 +33,7 @@ TeleopNode::TeleopNode()
       return msg;
     } ()
   }
-, _msg_pad{
+, _head_msg{
     []()
     {
       geometry_msgs::msg::Twist msg;
@@ -46,109 +46,46 @@ TeleopNode::TeleopNode()
       return msg;
     } ()
   }
-, _joy_mtx{}
-, _joy_thread{}
-, _joy_thread_active{false}
 {
-  declare_parameter("joy_dev_node", "/dev/input/js0");
-  declare_parameter("topic_robot_stick", "cmd_vel");
-  declare_parameter("topic_robot_pad", "cmd_vel_pad");
-  declare_parameter("robot_linear_x_scale_factor", 3.0);
-  declare_parameter("robot_linear_y_scale_factor", 3.0);
-  declare_parameter("robot_angular_x_scale_factor", 1.0);
-  declare_parameter("robot_angular_z_scale_factor", 1.0);
-  declare_parameter("head_angular_y_scale_factor", 1.0);
-  declare_parameter("head_angular_z_scale_factor", 1.0);
+  declare_parameter("joy_topic", "joy");
+  declare_parameter("robot_topic", "cmd_vel_robot");
+  declare_parameter("head_topic", "cmd_vel_head");
 
-  _teleop_stick_pub = create_publisher<geometry_msgs::msg::Twist>
-    (get_parameter("topic_robot_stick").as_string(), 10);
+  _joy_sub = create_subscription<sensor_msgs::msg::Joy>
+    (get_parameter("joy_topic").as_string(), 10, [this](sensor_msgs::msg::Joy::SharedPtr const msg)
+                                                 {
+                                                   updateRobotMessage(*msg);
+                                                   updateHeadMessage (*msg);
+                                                 });
+
+  _robot_pub = create_publisher<geometry_msgs::msg::Twist>
+    (get_parameter("robot_topic").as_string(), 10);
   
-  _teleop_pad_pub = create_publisher<geometry_msgs::msg::Twist>
-    (get_parameter("topic_robot_pad").as_string(), 10);
+  _head_pub = create_publisher<geometry_msgs::msg::Twist>
+    (get_parameter("head_topic").as_string(), 10);
 
   _teleop_pub_timer = create_wall_timer
-    (std::chrono::milliseconds(50), [this]() { this->teleopTimerCallback(); });
-
-  _joystick   = std::make_shared<Joystick>(get_parameter("joy_dev_node").as_string());
-  _joy_thread = std::thread([this]() { this->joystickThreadFunc(); });
-}
-
-TeleopNode::~TeleopNode()
-{
-  _joy_thread_active = false;
-  _joy_thread.join();
+    (std::chrono::milliseconds(50), [this]() { this->teleopPubFunc(); });
 }
 
 /**************************************************************************************
  * PRIVATE MEMBER FUNCTIONS
  **************************************************************************************/
 
-void TeleopNode::joystickThreadFunc()
+void TeleopNode::teleopPubFunc()
 {
-  _joy_thread_active = true;
-
-  while (_joy_thread_active)
-  {
-    JoystickEvent const evt = _joystick->update();
-
-    if (evt.isInit())
-      continue;
-
-    if (evt.isAxis())
-    {
-      RCLCPP_INFO(get_logger(), "Axis %d: %d", evt.number, evt.value);
-
-      PS3_AxisId const axis_id = static_cast<PS3_AxisId>(evt.number);
-      float const axis_scaled_val = static_cast<float>(evt.value) / static_cast<float>(std::numeric_limits<int16_t>::max());
-
-      std::lock_guard<std::mutex> lock(_joy_mtx);
-      _joystick_data[axis_id] = axis_scaled_val;
-    }
-
-    if (evt.isButton()) {
-      RCLCPP_INFO(get_logger(), "Button %d: %d", evt.number, evt.value);
-      
-      PS3_ButtonId const button_id = static_cast<PS3_ButtonId>(evt.number);
-
-      std::lock_guard<std::mutex> lock(_joy_mtx);
-      _button_data[button_id] = static_cast<bool>(evt.value);
-    }
-  }
+  _robot_pub->publish(_robot_msg);
+  _head_pub->publish(_head_msg);
 }
 
-void TeleopNode::teleopTimerCallback()
+void TeleopNode::updateRobotMessage(sensor_msgs::msg::Joy const & joy_msg)
 {
-  {
-    std::lock_guard<std::mutex> lock(_joy_mtx);
-  
-    if (_joystick_data.count(PS3_AxisId::LEFT_STICK_VERTICAL))
-      _msg_stick.linear.x = -1.0f * get_parameter("robot_linear_x_scale_factor").as_double() * _joystick_data[PS3_AxisId::LEFT_STICK_VERTICAL];
+  _robot_msg.linear.x  = (-1.0f) * joy_msg.axes[1]; /* LEFT_STICK_VERTICAL   */
+  _robot_msg.angular.z =           joy_msg.axes[0]; /* LEFT_STICK_HORIZONTAL */
+}
 
-    if (_joystick_data.count(PS3_AxisId::LEFT_STICK_HORIZONTAL))
-      _msg_stick.linear.y = get_parameter("robot_linear_y_scale_factor").as_double() * _joystick_data[PS3_AxisId::LEFT_STICK_HORIZONTAL];
-
-    if (_joystick_data.count(PS3_AxisId::RIGHT_STICK_VERTICAL))
-      _msg_stick.angular.x = get_parameter("robot_angular_x_scale_factor").as_double() * _joystick_data[PS3_AxisId::RIGHT_STICK_VERTICAL];
-    
-    if (_joystick_data.count(PS3_AxisId::RIGHT_STICK_HORIZONTAL))
-      _msg_stick.angular.z = get_parameter("robot_angular_z_scale_factor").as_double() * _joystick_data[PS3_AxisId::RIGHT_STICK_HORIZONTAL];
-
-
-    if (_button_data.count(PS3_ButtonId::PAD_UP) && _button_data[PS3_ButtonId::PAD_UP])
-      _msg_pad.angular.y = get_parameter("head_angular_y_scale_factor").as_double() * static_cast<double>(_button_data[PS3_ButtonId::PAD_UP]);
-    else if (_button_data.count(PS3_ButtonId::PAD_DOWN) && _button_data[PS3_ButtonId::PAD_DOWN])
-      _msg_pad.angular.y = -1.0f * get_parameter("head_angular_y_scale_factor").as_double() * static_cast<double>(_button_data[PS3_ButtonId::PAD_DOWN]);
-    else
-      _msg_pad.angular.y = 0.0f;
-
-    if (_button_data.count(PS3_ButtonId::PAD_LEFT) && _button_data[PS3_ButtonId::PAD_LEFT])
-      _msg_pad.angular.z = get_parameter("head_angular_z_scale_factor").as_double() * static_cast<double>(_button_data[PS3_ButtonId::PAD_LEFT]);
-    else if (_button_data.count(PS3_ButtonId::PAD_RIGHT) && _button_data[PS3_ButtonId::PAD_RIGHT])
-      _msg_pad.angular.z = -1.0f * get_parameter("head_angular_z_scale_factor").as_double() * static_cast<double>(_button_data[PS3_ButtonId::PAD_RIGHT]);
-    else
-      _msg_pad.angular.z = 0.0f;
-  }
-
-  _teleop_stick_pub->publish(_msg_stick);
-  _teleop_pad_pub->publish(_msg_pad);
+void TeleopNode::updateHeadMessage(sensor_msgs::msg::Joy const & joy_msg)
+{
+  _head_msg.angular.y = (-1.0f) * joy_msg.axes[4]; /* RIGHT_STICK_VERTICAL   */
+  _head_msg.angular.z =           joy_msg.axes[3]; /* RIGHT_STICK_HORIZONTAL */
 }
