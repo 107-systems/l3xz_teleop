@@ -17,7 +17,6 @@ include_directories(
 )
 #######################################################################################
 add_executable(${L3XZ_TELEOP_TARGET}
-  src/Joystick.cpp
   src/main.cpp
   src/TeleopNode.cpp
 )
