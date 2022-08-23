@@ -6,6 +6,10 @@
 
 Teleoperation for L3X-Z via PS3 joystick and ROS topics.
 
+<p align="center">
+  <a href="https://github.com/107-systems/l3xz"><img src="https://raw.githubusercontent.com/107-systems/.github/main/logo/l3xz-logo-memento-mori.png" width="40%"></a>
+</p>
+
 #### How-to-build
 ```bash
 colcon_ws/src$ git clone https://github.com/107-systems/l3xz_teleop
