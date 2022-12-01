@@ -9,10 +9,13 @@ def generate_launch_description():
       name='teleop_node',
       namespace='l3xz',
       output='screen',
+      emulate_tty=True,
       parameters=[
           {'joy_topic': 'joy'},
           {'robot_topic': 'cmd_vel_robot'},
           {'head_topic': 'cmd_vel_head'},
+          {'pan_max_dps' : 45.0},
+          {'tilt_max_dps' : 45.0},
       ]
     )
   ])

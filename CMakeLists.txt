@@ -18,8 +18,8 @@ include_directories(
 )
 #######################################################################################
 add_executable(${L3XZ_TELEOP_TARGET}
+  src/teleop/Node.cpp
   src/main.cpp
-  src/TeleopNode.cpp
 )
 #######################################################################################
 target_compile_features(${L3XZ_TELEOP_TARGET} PRIVATE cxx_std_17)
