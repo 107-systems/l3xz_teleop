@@ -59,6 +59,9 @@ Node::Node()
   declare_parameter("joy_topic", "joy");
   declare_parameter("robot_topic", "cmd_vel_robot");
   declare_parameter("head_topic", "cmd_vel_head");
+  declare_parameter("pan_max_dps", 10.0f);
+  declare_parameter("tilt_max_dps", 10.0f);
+
 
   _joy_sub = create_subscription<sensor_msgs::msg::Joy>
     (get_parameter("joy_topic").as_string(), 10, [this](sensor_msgs::msg::Joy::SharedPtr const msg)
@@ -93,8 +96,8 @@ void Node::updateRobotMessage(sensor_msgs::msg::Joy const &joy_msg)
 
 void Node::updateHeadMessage(sensor_msgs::msg::Joy const &joy_msg)
 {
-  _head_msg.angular.y = (-1.0f) * joy_msg.axes[4]; /* RIGHT_STICK_VERTICAL   */
-  _head_msg.angular.z = joy_msg.axes[3];           /* RIGHT_STICK_HORIZONTAL */
+  _head_msg.angular.y = (-1.0f) * joy_msg.axes[4] * get_parameter("pan_max_dps").as_double();  /* RIGHT_STICK_VERTICAL   */
+  _head_msg.angular.z = joy_msg.axes[3]           * get_parameter("tilt_max_dps").as_double(); /* RIGHT_STICK_HORIZONTAL */
 }
 
 /**************************************************************************************
