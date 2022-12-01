@@ -14,17 +14,24 @@
 #include <geometry_msgs/msg/twist.hpp>
 
 /**************************************************************************************
+ * NAMESPACE
+ **************************************************************************************/
+
+namespace l3xz::teleop
+{
+
+/**************************************************************************************
  * CLASS DECLARATION
  **************************************************************************************/
 
-class TeleopNode : public rclcpp::Node
+class Node : public rclcpp::Node
 {
 public:
-  TeleopNode();
+  Node();
 
 private:
   rclcpp::TimerBase::SharedPtr _teleop_pub_timer;
- 
+
   rclcpp::Subscription<sensor_msgs::msg::Joy>::SharedPtr _joy_sub;
 
   rclcpp::Publisher<geometry_msgs::msg::Twist>::SharedPtr _robot_pub;
@@ -32,8 +39,12 @@ private:
   rclcpp::Publisher<geometry_msgs::msg::Twist>::SharedPtr _head_pub;
   geometry_msgs::msg::Twist _head_msg;
 
-  void teleopPubFunc();
-
   void updateRobotMessage(sensor_msgs::msg::Joy const & joy_msg);
   void updateHeadMessage (sensor_msgs::msg::Joy const & joy_msg);
 };
+
+/**************************************************************************************
+ * NAMESPACE
+ **************************************************************************************/
+
+} /* l3xz::teleop */

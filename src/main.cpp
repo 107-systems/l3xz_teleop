@@ -8,7 +8,7 @@
  * INCLUDE
  **************************************************************************************/
 
-#include <l3xz_teleop/TeleopNode.h>
+#include <l3xz_teleop/Node.h>
 
 /**************************************************************************************
  * MAIN
@@ -18,7 +18,7 @@ int main(int argc, char * argv[])
 {
   rclcpp::init(argc, argv);
 
-  auto node = std::make_shared<TeleopNode>();
+  auto node = std::make_shared<l3xz::teleop::Node>();
 
   try
   {
