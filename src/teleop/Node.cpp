@@ -96,8 +96,11 @@ void Node::updateRobotMessage(sensor_msgs::msg::Joy const &joy_msg)
 
 void Node::updateHeadMessage(sensor_msgs::msg::Joy const &joy_msg)
 {
-  _head_msg.angular.y = (-1.0f) * joy_msg.axes[4] * get_parameter("pan_max_dps").as_double();  /* RIGHT_STICK_VERTICAL   */
-  _head_msg.angular.z = joy_msg.axes[3]           * get_parameter("tilt_max_dps").as_double(); /* RIGHT_STICK_HORIZONTAL */
+  float const pan_angular_velocity_dps  =           joy_msg.axes[3] * get_parameter("pan_max_dps").as_double();  /* RIGHT_STICK_HORIZONTAL */
+  float const tilt_angular_velocity_dps = (-1.0f) * joy_msg.axes[4] * get_parameter("tilt_max_dps").as_double(); /* RIGHT_STICK_VERTICAL   */
+
+  _head_msg.angular.z = pan_angular_velocity_dps  * M_PI / 180.0f;
+  _head_msg.angular.y = tilt_angular_velocity_dps * M_PI / 180.0f;
 }
 
 /**************************************************************************************
