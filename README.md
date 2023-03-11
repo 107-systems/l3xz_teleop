@@ -22,7 +22,7 @@ colcon build --packages-select l3xz_teleop
 #### How-to-run
 ```bash
 cd $COLCON_WS
-source install/setup.bash
+. install/setup.bash
 ros2 launch l3xz_teleop teleop.py
 ```
 Check the content of the published message via:
