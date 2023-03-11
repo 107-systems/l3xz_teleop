@@ -12,15 +12,18 @@ Teleoperation for L3X-Z via PS3 joystick and ROS topics.
 
 #### How-to-build
 ```bash
-colcon_ws/src$ git clone https://github.com/107-systems/l3xz_teleop
-colcon_ws$ source /opt/ros/humble/setup.bash
-colcon_ws$ colcon build --packages-select l3xz_teleop
+cd $COLCON_WS/src
+git clone https://github.com/107-systems/l3xz_teleop
+cd $COLCON_WS
+source /opt/ros/humble/setup.bash
+colcon build --packages-select l3xz_teleop
 ```
 
 #### How-to-run
 ```bash
-colcon_ws$ source install/setup.bash
-colcon_ws$ ros2 launch l3xz_teleop teleop.py
+cd $COLCON_WS
+. install/setup.bash
+ros2 launch l3xz_teleop teleop.py
 ```
 Check the content of the published message via:
 ```bash
