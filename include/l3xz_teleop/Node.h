@@ -4,20 +4,26 @@
  * Contributors: https://github.com/107-systems/l3xz_teleop/graphs/contributors.
  */
 
+#pragma once
+
 /**************************************************************************************
  * INCLUDE
  **************************************************************************************/
+
+#include <chrono>
 
 #include <rclcpp/rclcpp.hpp>
 
 #include <sensor_msgs/msg/joy.hpp>
 #include <geometry_msgs/msg/twist.hpp>
 
+#include <ros2_heartbeat/Publisher.h>
+
 /**************************************************************************************
  * NAMESPACE
  **************************************************************************************/
 
-namespace l3xz::teleop
+namespace l3xz
 {
 
 /**************************************************************************************
@@ -30,6 +36,10 @@ public:
   Node();
 
 private:
+  static std::chrono::milliseconds constexpr HEARTBEAT_LOOP_RATE{100};
+  ::heartbeat::Publisher::SharedPtr _heartbeat_pub;
+  void init_heartbeat();
+
   rclcpp::TimerBase::SharedPtr _teleop_pub_timer;
 
   rclcpp::Subscription<sensor_msgs::msg::Joy>::SharedPtr _joy_sub;
@@ -47,4 +57,4 @@ private:
  * NAMESPACE
  **************************************************************************************/
 
-} /* l3xz::teleop */
+} /* l3xz */
