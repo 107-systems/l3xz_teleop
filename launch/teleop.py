@@ -6,7 +6,7 @@ def generate_launch_description():
     Node(
       package='l3xz_teleop',
       executable='l3xz_teleop_node',
-      name='teleop',
+      name='l3xz_teleop',
       namespace='l3xz',
       output='screen',
       emulate_tty=True,
