@@ -10,15 +10,15 @@
 
 #include <l3xz_teleop/Node.h>
 
-#include <chrono>
 #include <limits>
 #include <numeric>
+#include <sstream>
 
 /**************************************************************************************
  * NAMESPACE
  **************************************************************************************/
 
-namespace l3xz::teleop
+namespace l3xz
 {
 
 /**************************************************************************************
@@ -62,6 +62,7 @@ Node::Node()
   declare_parameter("pan_max_dps", 10.0f);
   declare_parameter("tilt_max_dps", 10.0f);
 
+  init_heartbeat();
 
   _joy_sub = create_subscription<sensor_msgs::msg::Joy>
     (get_parameter("joy_topic").as_string(), 10, [this](sensor_msgs::msg::Joy::SharedPtr const msg)
@@ -88,6 +89,14 @@ Node::Node()
  * PRIVATE MEMBER FUNCTIONS
  **************************************************************************************/
 
+void Node::init_heartbeat()
+{
+  std::stringstream heartbeat_topic;
+  heartbeat_topic << "/l3xz/" << get_name() << "/heartbeat";
+
+  _heartbeat_pub = heartbeat::Publisher::create(*this, heartbeat_topic.str(), HEARTBEAT_LOOP_RATE);
+}
+
 void Node::updateRobotMessage(sensor_msgs::msg::Joy const &joy_msg)
 {
   _robot_msg.linear.x = (-1.0f) * joy_msg.axes[1]; /* LEFT_STICK_VERTICAL   */
@@ -107,4 +116,4 @@ void Node::updateHeadMessage(sensor_msgs::msg::Joy const &joy_msg)
  * NAMESPACE
  **************************************************************************************/
 
-} /* l3xz::teleop */
+} /* l3xz */
