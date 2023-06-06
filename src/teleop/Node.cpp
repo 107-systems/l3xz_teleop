@@ -69,6 +69,18 @@ Node::Node()
     {
       updateRobotMessage(*msg);
       updateHeadMessage (*msg);
+
+      {
+        std_msgs::msg::Bool req_up_msg;
+        req_up_msg.data = msg->buttons[0] != 0;
+        _robot_req_up_pub->publish(req_up_msg);
+      }
+
+      {
+        std_msgs::msg::Bool req_down_msg;
+        req_down_msg.data = msg->buttons[1] != 0;
+        _robot_req_down_pub->publish(req_down_msg);
+      }
     });
 
   _robot_pub = create_publisher<geometry_msgs::msg::Twist>
@@ -76,6 +88,9 @@ Node::Node()
 
   _head_pub = create_publisher<geometry_msgs::msg::Twist>
     (get_parameter("head_topic").as_string(), 10);
+
+  _robot_req_up_pub   = create_publisher<std_msgs::msg::Bool>("/l3xz/cmd_robot/req_up", 1);
+  _robot_req_down_pub = create_publisher<std_msgs::msg::Bool>("/l3xz/cmd_robot/req_down", 1);
 
   _teleop_pub_timer = create_wall_timer
     (std::chrono::milliseconds(50), [this]()

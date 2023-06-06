@@ -14,6 +14,7 @@
 
 #include <rclcpp/rclcpp.hpp>
 
+#include <std_msgs/msg/bool.hpp>
 #include <sensor_msgs/msg/joy.hpp>
 #include <geometry_msgs/msg/twist.hpp>
 
@@ -48,6 +49,8 @@ private:
   geometry_msgs::msg::Twist _robot_msg;
   rclcpp::Publisher<geometry_msgs::msg::Twist>::SharedPtr _head_pub;
   geometry_msgs::msg::Twist _head_msg;
+
+  rclcpp::Publisher<std_msgs::msg::Bool>::SharedPtr _robot_req_up_pub, _robot_req_down_pub;
 
   void updateRobotMessage(sensor_msgs::msg::Joy const & joy_msg);
   void updateHeadMessage (sensor_msgs::msg::Joy const & joy_msg);
