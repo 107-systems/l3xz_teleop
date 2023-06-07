@@ -35,6 +35,7 @@ class Node : public rclcpp::Node
 {
 public:
   Node();
+  ~Node();
 
 private:
   static std::chrono::milliseconds constexpr HEARTBEAT_LOOP_RATE{100};

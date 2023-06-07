@@ -94,6 +94,13 @@ Node::Node()
       _robot_req_up_pub->publish(_req_up_msg);
       _robot_req_down_pub->publish(_req_down_msg);
     });
+
+  RCLCPP_INFO(get_logger(), "%s init complete.", get_name());
+}
+
+Node::~Node()
+{
+  RCLCPP_INFO(get_logger(), "%s shut down.", get_name());
 }
 
 /**************************************************************************************
