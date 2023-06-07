@@ -65,6 +65,7 @@ Node::Node()
   declare_parameter("tilt_max_dps", 10.0f);
 
   init_heartbeat();
+  init_pub();
 
   _joy_sub = create_subscription<sensor_msgs::msg::Joy>
     (get_parameter("joy_topic").as_string(), 10, [this](sensor_msgs::msg::Joy::SharedPtr const msg)
@@ -85,17 +86,6 @@ Node::Node()
       }
     });
 
-  _robot_pub = create_publisher<geometry_msgs::msg::Twist>(
-    get_parameter("robot_topic").as_string(), 10);
-
-  _head_pub = create_publisher<geometry_msgs::msg::Twist>(
-    get_parameter("head_topic").as_string(), 10);
-
-  _robot_req_up_pub = create_publisher<std_msgs::msg::Bool>(
-    get_parameter("robot_req_up_topic").as_string(), 1);
-  _robot_req_down_pub = create_publisher<std_msgs::msg::Bool>(
-    get_parameter("robot_req_down_topic").as_string(), 1);
-
   _teleop_pub_timer = create_wall_timer
     (std::chrono::milliseconds(50), [this]()
     {
@@ -114,6 +104,21 @@ void Node::init_heartbeat()
   heartbeat_topic << "/l3xz/" << get_name() << "/heartbeat";
 
   _heartbeat_pub = heartbeat::Publisher::create(*this, heartbeat_topic.str(), HEARTBEAT_LOOP_RATE);
+}
+
+void Node::init_pub()
+{
+  _robot_pub = create_publisher<geometry_msgs::msg::Twist>(
+    get_parameter("robot_topic").as_string(), 10);
+
+  _head_pub = create_publisher<geometry_msgs::msg::Twist>(
+    get_parameter("head_topic").as_string(), 10);
+
+  _robot_req_up_pub = create_publisher<std_msgs::msg::Bool>(
+    get_parameter("robot_req_up_topic").as_string(), 1);
+
+  _robot_req_down_pub = create_publisher<std_msgs::msg::Bool>(
+    get_parameter("robot_req_down_topic").as_string(), 1);
 }
 
 void Node::updateRobotMessage(sensor_msgs::msg::Joy const &joy_msg)
