@@ -14,6 +14,8 @@ def generate_launch_description():
           {'joy_topic': 'joy'},
           {'robot_topic': 'cmd_vel_robot'},
           {'head_topic': 'cmd_vel_head'},
+          {'robot_req_up_topic': 'cmd_robot/req_up'},
+          {'robot_req_down_topic': 'cmd_robot/req_down'},
           {'pan_max_dps' : 90.0},
           {'tilt_max_dps' : 90.0},
       ]

@@ -59,6 +59,8 @@ Node::Node()
   declare_parameter("joy_topic", "joy");
   declare_parameter("robot_topic", "cmd_vel_robot");
   declare_parameter("head_topic", "cmd_vel_head");
+  declare_parameter("robot_req_up_topic", "cmd_robot/req_up");
+  declare_parameter("robot_req_down_topic", "cmd_robot/req_down");
   declare_parameter("pan_max_dps", 10.0f);
   declare_parameter("tilt_max_dps", 10.0f);
 
@@ -83,14 +85,16 @@ Node::Node()
       }
     });
 
-  _robot_pub = create_publisher<geometry_msgs::msg::Twist>
-    (get_parameter("robot_topic").as_string(), 10);
+  _robot_pub = create_publisher<geometry_msgs::msg::Twist>(
+    get_parameter("robot_topic").as_string(), 10);
 
-  _head_pub = create_publisher<geometry_msgs::msg::Twist>
-    (get_parameter("head_topic").as_string(), 10);
+  _head_pub = create_publisher<geometry_msgs::msg::Twist>(
+    get_parameter("head_topic").as_string(), 10);
 
-  _robot_req_up_pub   = create_publisher<std_msgs::msg::Bool>("/l3xz/cmd_robot/req_up", 1);
-  _robot_req_down_pub = create_publisher<std_msgs::msg::Bool>("/l3xz/cmd_robot/req_down", 1);
+  _robot_req_up_pub = create_publisher<std_msgs::msg::Bool>(
+    get_parameter("robot_req_up_topic").as_string(), 1);
+  _robot_req_down_pub = create_publisher<std_msgs::msg::Bool>(
+    get_parameter("robot_req_down_topic").as_string(), 1);
 
   _teleop_pub_timer = create_wall_timer
     (std::chrono::milliseconds(50), [this]()
