@@ -137,8 +137,8 @@ void Node::init_pub()
 
 void Node::updateRobotMessage(sensor_msgs::msg::Joy::SharedPtr const joy_msg)
 {
-  _robot_msg.linear.x = (-1.0f) * joy_msg->axes[1]; /* LEFT_STICK_VERTICAL   */
-  _robot_msg.angular.z = joy_msg->axes[0];          /* LEFT_STICK_HORIZONTAL */
+  _robot_msg.linear.x  = (-1.0f) * joy_msg->axes[1]; /* LEFT_STICK_VERTICAL   */
+  _robot_msg.angular.z =           joy_msg->axes[0]; /* LEFT_STICK_HORIZONTAL */
 }
 
 void Node::updateHeadMessage(sensor_msgs::msg::Joy::SharedPtr const joy_msg)
