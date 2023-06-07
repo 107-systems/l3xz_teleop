@@ -55,34 +55,52 @@ Node::Node()
     return msg;
   }()
 }
+, _req_up_msg
+{
+  []()
+  {
+    std_msgs::msg::Bool msg;
+    msg.data = false;
+    return msg;
+  }()
+}
+, _req_down_msg
+{
+  []()
+  {
+    std_msgs::msg::Bool msg;
+    msg.data = false;
+    return msg;
+  }()
+}
 {
   declare_parameter("joy_topic", "joy");
   declare_parameter("robot_topic", "cmd_vel_robot");
   declare_parameter("head_topic", "cmd_vel_head");
+  declare_parameter("robot_req_up_topic", "cmd_robot/req_up");
+  declare_parameter("robot_req_down_topic", "cmd_robot/req_down");
   declare_parameter("pan_max_dps", 10.0f);
   declare_parameter("tilt_max_dps", 10.0f);
 
   init_heartbeat();
-
-  _joy_sub = create_subscription<sensor_msgs::msg::Joy>
-    (get_parameter("joy_topic").as_string(), 10, [this](sensor_msgs::msg::Joy::SharedPtr const msg)
-    {
-      updateRobotMessage(*msg);
-      updateHeadMessage (*msg);
-    });
-
-  _robot_pub = create_publisher<geometry_msgs::msg::Twist>
-    (get_parameter("robot_topic").as_string(), 10);
-
-  _head_pub = create_publisher<geometry_msgs::msg::Twist>
-    (get_parameter("head_topic").as_string(), 10);
+  init_sub();
+  init_pub();
 
   _teleop_pub_timer = create_wall_timer
     (std::chrono::milliseconds(50), [this]()
     {
       _robot_pub->publish(_robot_msg);
       _head_pub->publish(_head_msg);
+      _robot_req_up_pub->publish(_req_up_msg);
+      _robot_req_down_pub->publish(_req_down_msg);
     });
+
+  RCLCPP_INFO(get_logger(), "%s init complete.", get_name());
+}
+
+Node::~Node()
+{
+  RCLCPP_INFO(get_logger(), "%s shut down.", get_name());
 }
 
 /**************************************************************************************
@@ -97,19 +115,56 @@ void Node::init_heartbeat()
   _heartbeat_pub = heartbeat::Publisher::create(*this, heartbeat_topic.str(), HEARTBEAT_LOOP_RATE);
 }
 
-void Node::updateRobotMessage(sensor_msgs::msg::Joy const &joy_msg)
+void Node::init_sub()
 {
-  _robot_msg.linear.x = (-1.0f) * joy_msg.axes[1]; /* LEFT_STICK_VERTICAL   */
-  _robot_msg.angular.z = joy_msg.axes[0];          /* LEFT_STICK_HORIZONTAL */
+  _joy_sub = create_subscription<sensor_msgs::msg::Joy>
+    (get_parameter("joy_topic").as_string(), 10, [this](sensor_msgs::msg::Joy::SharedPtr const joy_msg)
+    {
+      updateRobotMessage       (joy_msg);
+      updateHeadMessage        (joy_msg);
+      updateRobotReqUpMessage  (joy_msg);
+      updateRobotReqDownMessage(joy_msg);
+    });
 }
 
-void Node::updateHeadMessage(sensor_msgs::msg::Joy const &joy_msg)
+void Node::init_pub()
 {
-  float const pan_angular_velocity_dps  =           joy_msg.axes[3] * get_parameter("pan_max_dps").as_double();  /* RIGHT_STICK_HORIZONTAL */
-  float const tilt_angular_velocity_dps = (-1.0f) * joy_msg.axes[4] * get_parameter("tilt_max_dps").as_double(); /* RIGHT_STICK_VERTICAL   */
+  _robot_pub = create_publisher<geometry_msgs::msg::Twist>(
+    get_parameter("robot_topic").as_string(), 10);
+
+  _head_pub = create_publisher<geometry_msgs::msg::Twist>(
+    get_parameter("head_topic").as_string(), 10);
+
+  _robot_req_up_pub = create_publisher<std_msgs::msg::Bool>(
+    get_parameter("robot_req_up_topic").as_string(), 1);
+
+  _robot_req_down_pub = create_publisher<std_msgs::msg::Bool>(
+    get_parameter("robot_req_down_topic").as_string(), 1);
+}
+
+void Node::updateRobotMessage(sensor_msgs::msg::Joy::SharedPtr const joy_msg)
+{
+  _robot_msg.linear.x  = (-1.0f) * joy_msg->axes[1]; /* LEFT_STICK_VERTICAL   */
+  _robot_msg.angular.z =           joy_msg->axes[0]; /* LEFT_STICK_HORIZONTAL */
+}
+
+void Node::updateHeadMessage(sensor_msgs::msg::Joy::SharedPtr const joy_msg)
+{
+  float const pan_angular_velocity_dps  =           joy_msg->axes[3] * get_parameter("pan_max_dps").as_double();  /* RIGHT_STICK_HORIZONTAL */
+  float const tilt_angular_velocity_dps = (-1.0f) * joy_msg->axes[4] * get_parameter("tilt_max_dps").as_double(); /* RIGHT_STICK_VERTICAL   */
 
   _head_msg.angular.z = pan_angular_velocity_dps  * M_PI / 180.0f;
   _head_msg.angular.y = tilt_angular_velocity_dps * M_PI / 180.0f;
+}
+
+void Node::updateRobotReqUpMessage(sensor_msgs::msg::Joy::SharedPtr const joy_msg)
+{
+  _req_up_msg.data = joy_msg->buttons[0] != 0;
+}
+
+void Node::updateRobotReqDownMessage(sensor_msgs::msg::Joy::SharedPtr const joy_msg)
+{
+  _req_down_msg.data = joy_msg->buttons[1] != 0;
 }
 
 /**************************************************************************************

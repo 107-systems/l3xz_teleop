@@ -10,6 +10,7 @@ endif()
 #######################################################################################
 find_package(ament_cmake REQUIRED)
 find_package(rclcpp REQUIRED)
+find_package(std_msgs REQUIRED)
 find_package(sensor_msgs REQUIRED)
 find_package(geometry_msgs REQUIRED)
 find_package(ros2_heartbeat REQUIRED)
@@ -24,7 +25,7 @@ add_executable(${L3XZ_TELEOP_TARGET}
 )
 #######################################################################################
 target_compile_features(${L3XZ_TELEOP_TARGET} PRIVATE cxx_std_17)
-ament_target_dependencies(${L3XZ_TELEOP_TARGET} rclcpp sensor_msgs geometry_msgs ros2_heartbeat)
+ament_target_dependencies(${L3XZ_TELEOP_TARGET} rclcpp std_msgs sensor_msgs geometry_msgs ros2_heartbeat)
 #######################################################################################
 install(TARGETS
   ${L3XZ_TELEOP_TARGET}
