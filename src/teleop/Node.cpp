@@ -55,6 +55,24 @@ Node::Node()
     return msg;
   }()
 }
+, _req_up_msg
+{
+  []()
+  {
+    std_msgs::msg::Bool msg;
+    msg.data = false;
+    return msg;
+  }()
+}
+, _req_down_msg
+{
+  []()
+  {
+    std_msgs::msg::Bool msg;
+    msg.data = false;
+    return msg;
+  }()
+}
 {
   declare_parameter("joy_topic", "joy");
   declare_parameter("robot_topic", "cmd_vel_robot");
@@ -65,32 +83,16 @@ Node::Node()
   declare_parameter("tilt_max_dps", 10.0f);
 
   init_heartbeat();
+  init_sub();
   init_pub();
-
-  _joy_sub = create_subscription<sensor_msgs::msg::Joy>
-    (get_parameter("joy_topic").as_string(), 10, [this](sensor_msgs::msg::Joy::SharedPtr const msg)
-    {
-      updateRobotMessage(*msg);
-      updateHeadMessage (*msg);
-
-      {
-        std_msgs::msg::Bool req_up_msg;
-        req_up_msg.data = msg->buttons[0] != 0;
-        _robot_req_up_pub->publish(req_up_msg);
-      }
-
-      {
-        std_msgs::msg::Bool req_down_msg;
-        req_down_msg.data = msg->buttons[1] != 0;
-        _robot_req_down_pub->publish(req_down_msg);
-      }
-    });
 
   _teleop_pub_timer = create_wall_timer
     (std::chrono::milliseconds(50), [this]()
     {
       _robot_pub->publish(_robot_msg);
       _head_pub->publish(_head_msg);
+      _robot_req_up_pub->publish(_req_up_msg);
+      _robot_req_down_pub->publish(_req_down_msg);
     });
 }
 
@@ -104,6 +106,18 @@ void Node::init_heartbeat()
   heartbeat_topic << "/l3xz/" << get_name() << "/heartbeat";
 
   _heartbeat_pub = heartbeat::Publisher::create(*this, heartbeat_topic.str(), HEARTBEAT_LOOP_RATE);
+}
+
+void Node::init_sub()
+{
+  _joy_sub = create_subscription<sensor_msgs::msg::Joy>
+    (get_parameter("joy_topic").as_string(), 10, [this](sensor_msgs::msg::Joy::SharedPtr const msg)
+    {
+      updateRobotMessage(*msg);
+      updateHeadMessage(*msg);
+      updateRobotReqUpMessage(*msg);
+      updateRobotReqDownMessage(*msg);
+    });
 }
 
 void Node::init_pub()
@@ -134,6 +148,16 @@ void Node::updateHeadMessage(sensor_msgs::msg::Joy const &joy_msg)
 
   _head_msg.angular.z = pan_angular_velocity_dps  * M_PI / 180.0f;
   _head_msg.angular.y = tilt_angular_velocity_dps * M_PI / 180.0f;
+}
+
+void Node::updateRobotReqUpMessage(sensor_msgs::msg::Joy const & joy_msg)
+{
+  _req_up_msg.data = joy_msg.buttons[0] != 0;
+}
+
+void Node::updateRobotReqDownMessage(sensor_msgs::msg::Joy const & joy_msg)
+{
+  _req_down_msg.data = joy_msg.buttons[1] != 0;
 }
 
 /**************************************************************************************
