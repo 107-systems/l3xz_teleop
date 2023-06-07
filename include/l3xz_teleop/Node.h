@@ -54,10 +54,10 @@ private:
   rclcpp::Publisher<std_msgs::msg::Bool>::SharedPtr _robot_req_up_pub, _robot_req_down_pub;
   void init_pub();
 
-  void updateRobotMessage(sensor_msgs::msg::Joy const & joy_msg);
-  void updateHeadMessage(sensor_msgs::msg::Joy const & joy_msg);
-  void updateRobotReqUpMessage(sensor_msgs::msg::Joy const & joy_msg);
-  void updateRobotReqDownMessage(sensor_msgs::msg::Joy const & joy_msg);
+  void updateRobotMessage       (sensor_msgs::msg::Joy::SharedPtr const joy_msg);
+  void updateHeadMessage        (sensor_msgs::msg::Joy::SharedPtr const joy_msg);
+  void updateRobotReqUpMessage  (sensor_msgs::msg::Joy::SharedPtr const joy_msg);
+  void updateRobotReqDownMessage(sensor_msgs::msg::Joy::SharedPtr const joy_msg);
 };
 
 /**************************************************************************************
