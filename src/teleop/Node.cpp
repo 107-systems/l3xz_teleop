@@ -27,6 +27,11 @@ namespace l3xz
 
 Node::Node()
 : rclcpp::Node("l3xz_teleop")
+, _joy_qos_profile
+{
+  rclcpp::KeepLast(10),
+  rmw_qos_profile_sensor_data
+}
 , _robot_msg
 {
   []()
@@ -75,6 +80,7 @@ Node::Node()
 }
 {
   declare_parameter("joy_topic", "joy");
+  declare_parameter("joy_topic_deadline_ms", 100);
   declare_parameter("robot_topic", "cmd_vel_robot");
   declare_parameter("head_topic", "cmd_vel_head");
   declare_parameter("robot_req_up_topic", "cmd_robot/req_up");
@@ -117,14 +123,32 @@ void Node::init_heartbeat()
 
 void Node::init_sub()
 {
-  _joy_sub = create_subscription<sensor_msgs::msg::Joy>
-    (get_parameter("joy_topic").as_string(), 10, [this](sensor_msgs::msg::Joy::SharedPtr const joy_msg)
+  auto const joy_topic = get_parameter("joy_topic").as_string();
+  auto const joy_topic_deadline = std::chrono::milliseconds(get_parameter("joy_topic_deadline_ms").as_int());
+
+  _joy_qos_profile.deadline(joy_topic_deadline);
+
+  _joy_sub_options.event_callbacks.deadline_callback =
+    [this, joy_topic](rclcpp::QOSDeadlineRequestedInfo & event) -> void
+    {
+      RCLCPP_ERROR(get_logger(),
+                   "Dead line configured for topic %s missed (total_count: %d, total_count_change: %d).",
+                   joy_topic.c_str(),
+                   event.total_count,
+                   event.total_count_change);
+    };
+
+  _joy_sub = create_subscription<sensor_msgs::msg::Joy>(
+    joy_topic,
+    _joy_qos_profile,
+    [this](sensor_msgs::msg::Joy::SharedPtr const joy_msg)
     {
       updateRobotMessage       (joy_msg);
       updateHeadMessage        (joy_msg);
       updateRobotReqUpMessage  (joy_msg);
       updateRobotReqDownMessage(joy_msg);
-    });
+    },
+    _joy_sub_options);
 }
 
 void Node::init_pub()

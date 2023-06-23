@@ -39,16 +39,17 @@ ros2 topic echo /l3xz/cmd_vel_robot
 | `/l3xz/joy` | [`sensor_msgs/Joy`](http://docs.ros.org/en/api/sensor_msgs/html/msg/Joy.html) |
 
 ##### Published Topics
-| Default name | Type |
-|:-:|:-:|
-| `/l3xz/cmd_vel_robot` | [`geometry_msgs/Twist`](http://docs.ros.org/en/api/geometry_msgs/html/msg/Twist.html) |
-| `/l3xz/cmd_vel_head` | [`geometry_msgs/Twist`](http://docs.ros.org/en/api/geometry_msgs/html/msg/Twist.html) |
+|     Default name      |                                          Type                                          |
+|:---------------------:|:--------------------------------------------------------------------------------------:|
+| `/l3xz/cmd_vel_robot` | [`geometry_msgs/Twist`](http://docs.ros.org/en/api/geometry_msgs/html/msg/Twist.html)  |
+| `/l3xz/cmd_vel_head`  | [`geometry_msgs/Twist`](http://docs.ros.org/en/api/geometry_msgs/html/msg/Twist.html)  |
 
 ##### Parameters
-| Name | Default | Description |
-|:-:|:-:|-|
-| `joy_topic` | `joy` | Name of topic from where we are subscribing joystick messages. |
-| `robot_topic` | `cmd_vel_robot` | Name of topic for controlling L3X-Z forward/angular speed (`linear.x`/, `angular.z`). |
-| `head_topic` | `cmd_vel_head` | Name of topic for controlling L3X-Z sensor head (`angular.y`/, `angular.z`) in degree per second (**dps**). |
-| `pan_max_dps` | 10.0° | Maximum target angular velocity for pan servo of the L3X-Z sensor head. |
-| `tilt_max_dps` | 10.0° | Maximum target angular velocity for tilt servo of the L3X-Z sensor head. |
+|          Name           |     Default     | Description                                                                                                 |
+|:-----------------------:|:---------------:|-------------------------------------------------------------------------------------------------------------|
+|      `joy_topic`        |      `joy`      | Name of topic from where we are subscribing joystick messages.                                              |
+| `joy_topic_deadline_ms` |      100        | Deadline in milliseconds within which a new joystick message is expected.                                   |
+|      `robot_topic`      | `cmd_vel_robot` | Name of topic for controlling L3X-Z forward/angular speed (`linear.x`/, `angular.z`).                       |
+|      `head_topic`       | `cmd_vel_head`  | Name of topic for controlling L3X-Z sensor head (`angular.y`/, `angular.z`) in degree per second (**dps**). |
+|      `pan_max_dps`      |      10.0°      | Maximum target angular velocity for pan servo of the L3X-Z sensor head.                                     |
+|     `tilt_max_dps`      |      10.0°      | Maximum target angular velocity for tilt servo of the L3X-Z sensor head.                                    |

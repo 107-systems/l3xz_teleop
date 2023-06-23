@@ -12,6 +12,7 @@
 
 #include <chrono>
 
+#include <rclcpp/qos.hpp>
 #include <rclcpp/rclcpp.hpp>
 
 #include <std_msgs/msg/bool.hpp>
@@ -44,6 +45,8 @@ private:
 
   rclcpp::TimerBase::SharedPtr _teleop_pub_timer;
 
+  rclcpp::QoS _joy_qos_profile;
+  rclcpp::SubscriptionOptions _joy_sub_options;
   rclcpp::Subscription<sensor_msgs::msg::Joy>::SharedPtr _joy_sub;
   void init_sub();
 

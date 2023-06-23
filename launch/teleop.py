@@ -12,6 +12,7 @@ def generate_launch_description():
       emulate_tty=True,
       parameters=[
           {'joy_topic': 'joy'},
+          {'joy_topic_deadline_ms': 100},
           {'robot_topic': 'cmd_vel_robot'},
           {'head_topic': 'cmd_vel_head'},
           {'robot_req_up_topic': 'cmd_robot/req_up'},
