@@ -43,12 +43,11 @@ private:
   ::heartbeat::Publisher::SharedPtr _heartbeat_pub;
   void init_heartbeat();
 
-  rclcpp::TimerBase::SharedPtr _teleop_pub_timer;
-
   rclcpp::QoS _joy_qos_profile;
   rclcpp::SubscriptionOptions _joy_sub_options;
   rclcpp::Subscription<sensor_msgs::msg::Joy>::SharedPtr _joy_sub;
   void init_sub();
+  void onJoyMsg(sensor_msgs::msg::Joy::SharedPtr const joy_msg);
 
   geometry_msgs::msg::Twist _robot_msg;
   rclcpp::Publisher<geometry_msgs::msg::Twist>::SharedPtr _robot_pub;
@@ -57,11 +56,6 @@ private:
   std_msgs::msg::Bool _req_up_msg, _req_down_msg;
   rclcpp::Publisher<std_msgs::msg::Bool>::SharedPtr _robot_req_up_pub, _robot_req_down_pub;
   void init_pub();
-
-  void updateRobotMessage       (sensor_msgs::msg::Joy::SharedPtr const joy_msg);
-  void updateHeadMessage        (sensor_msgs::msg::Joy::SharedPtr const joy_msg);
-  void updateRobotReqUpMessage  (sensor_msgs::msg::Joy::SharedPtr const joy_msg);
-  void updateRobotReqDownMessage(sensor_msgs::msg::Joy::SharedPtr const joy_msg);
 };
 
 /**************************************************************************************

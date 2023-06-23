@@ -92,15 +92,6 @@ Node::Node()
   init_sub();
   init_pub();
 
-  _teleop_pub_timer = create_wall_timer
-    (std::chrono::milliseconds(50), [this]()
-    {
-      _robot_pub->publish(_robot_msg);
-      _head_pub->publish(_head_msg);
-      _robot_req_up_pub->publish(_req_up_msg);
-      _robot_req_down_pub->publish(_req_down_msg);
-    });
-
   RCLCPP_INFO(get_logger(), "%s init complete.", get_name());
 }
 
@@ -132,7 +123,7 @@ void Node::init_sub()
     [this, joy_topic](rclcpp::QOSDeadlineRequestedInfo & event) -> void
     {
       RCLCPP_ERROR(get_logger(),
-                   "Dead line configured for topic %s missed (total_count: %d, total_count_change: %d).",
+                   "Dead line configured for topic \"%s\" missed (total_count: %d, total_count_change: %d).",
                    joy_topic.c_str(),
                    event.total_count,
                    event.total_count_change);
@@ -141,14 +132,28 @@ void Node::init_sub()
   _joy_sub = create_subscription<sensor_msgs::msg::Joy>(
     joy_topic,
     _joy_qos_profile,
-    [this](sensor_msgs::msg::Joy::SharedPtr const joy_msg)
-    {
-      updateRobotMessage       (joy_msg);
-      updateHeadMessage        (joy_msg);
-      updateRobotReqUpMessage  (joy_msg);
-      updateRobotReqDownMessage(joy_msg);
-    },
-    _joy_sub_options);
+    [this](sensor_msgs::msg::Joy::SharedPtr const joy_msg) { this->onJoyMsg(joy_msg); },
+    _joy_sub_options
+    );
+}
+
+void Node::onJoyMsg(sensor_msgs::msg::Joy::SharedPtr const joy_msg)
+{
+  _robot_msg.linear.x  = (-1.0f) * joy_msg->axes[1]; /* LEFT_STICK_VERTICAL   */
+  _robot_msg.angular.z =           joy_msg->axes[0]; /* LEFT_STICK_HORIZONTAL */
+  _robot_pub->publish(_robot_msg);
+
+  float const pan_angular_velocity_dps  =           joy_msg->axes[3] * get_parameter("pan_max_dps").as_double();  /* RIGHT_STICK_HORIZONTAL */
+  float const tilt_angular_velocity_dps = (-1.0f) * joy_msg->axes[4] * get_parameter("tilt_max_dps").as_double(); /* RIGHT_STICK_VERTICAL   */
+  _head_msg.angular.z = pan_angular_velocity_dps  * M_PI / 180.0f;
+  _head_msg.angular.y = tilt_angular_velocity_dps * M_PI / 180.0f;
+  _head_pub->publish(_head_msg);
+
+  _req_up_msg.data = joy_msg->buttons[0] != 0;
+  _robot_req_up_pub->publish(_req_up_msg);
+
+  _req_down_msg.data = joy_msg->buttons[1] != 0;
+  _robot_req_down_pub->publish(_req_down_msg);
 }
 
 void Node::init_pub()
@@ -164,31 +169,6 @@ void Node::init_pub()
 
   _robot_req_down_pub = create_publisher<std_msgs::msg::Bool>(
     get_parameter("robot_req_down_topic").as_string(), 1);
-}
-
-void Node::updateRobotMessage(sensor_msgs::msg::Joy::SharedPtr const joy_msg)
-{
-  _robot_msg.linear.x  = (-1.0f) * joy_msg->axes[1]; /* LEFT_STICK_VERTICAL   */
-  _robot_msg.angular.z =           joy_msg->axes[0]; /* LEFT_STICK_HORIZONTAL */
-}
-
-void Node::updateHeadMessage(sensor_msgs::msg::Joy::SharedPtr const joy_msg)
-{
-  float const pan_angular_velocity_dps  =           joy_msg->axes[3] * get_parameter("pan_max_dps").as_double();  /* RIGHT_STICK_HORIZONTAL */
-  float const tilt_angular_velocity_dps = (-1.0f) * joy_msg->axes[4] * get_parameter("tilt_max_dps").as_double(); /* RIGHT_STICK_VERTICAL   */
-
-  _head_msg.angular.z = pan_angular_velocity_dps  * M_PI / 180.0f;
-  _head_msg.angular.y = tilt_angular_velocity_dps * M_PI / 180.0f;
-}
-
-void Node::updateRobotReqUpMessage(sensor_msgs::msg::Joy::SharedPtr const joy_msg)
-{
-  _req_up_msg.data = joy_msg->buttons[0] != 0;
-}
-
-void Node::updateRobotReqDownMessage(sensor_msgs::msg::Joy::SharedPtr const joy_msg)
-{
-  _req_down_msg.data = joy_msg->buttons[1] != 0;
 }
 
 /**************************************************************************************
