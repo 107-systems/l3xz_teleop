@@ -87,8 +87,8 @@ void Node::init_sub()
     {
       RCLCPP_ERROR_THROTTLE(get_logger(),
                             *get_clock(),
-                            1000,
-                            "Dead line configured for topic \"%s\" missed (total_count: %d, total_count_change: %d).",
+                            5*1000UL,
+                            "dead line missed for \"%s\" (total_count: %d, total_count_change: %d).",
                             joy_topic.c_str(),
                             event.total_count,
                             event.total_count_change);
