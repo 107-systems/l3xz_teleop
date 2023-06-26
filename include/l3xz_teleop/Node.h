@@ -54,20 +54,27 @@ private:
   geometry_msgs::msg::Twist _robot_msg;
   static geometry_msgs::msg::Twist create_init_robot_msg();
   rclcpp::Publisher<geometry_msgs::msg::Twist>::SharedPtr _robot_pub;
+  rclcpp::TimerBase::SharedPtr _robot_pub_timer;
+  void init_robot_pub();
 
   geometry_msgs::msg::Twist _head_msg;
   static geometry_msgs::msg::Twist create_init_head_msg();
   rclcpp::Publisher<geometry_msgs::msg::Twist>::SharedPtr _head_pub;
+  rclcpp::TimerBase::SharedPtr _head_pub_timer;
+  void init_head_pub();
 
   std_msgs::msg::Bool _req_up_msg;
   static std_msgs::msg::Bool create_init_req_up_msg();
   rclcpp::Publisher<std_msgs::msg::Bool>::SharedPtr _robot_req_up_pub;
+  rclcpp::TimerBase::SharedPtr _robot_req_up_pub_timer;
+  void init_robot_req_up_pub();
 
   std_msgs::msg::Bool _req_down_msg;
   static std_msgs::msg::Bool create_init_req_down_msg();
   rclcpp::Publisher<std_msgs::msg::Bool>::SharedPtr _robot_req_down_pub;
+  rclcpp::TimerBase::SharedPtr _robot_req_down_pub_timer;
+  void init_robot_req_down_pub();
 
-  rclcpp::TimerBase::SharedPtr _teleop_pub_timer;
   void init_pub();
 
   struct liveliness_gained { };

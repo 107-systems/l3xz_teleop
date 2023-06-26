@@ -41,11 +41,14 @@ Node::Node()
   declare_parameter("joy_topic", "joy");
   declare_parameter("joy_topic_deadline_ms", 100);
   declare_parameter("joy_topic_liveliness_lease_duration", 1000);
-  declare_parameter("teleop_topic_publish_period_ms", 50);
   declare_parameter("robot_topic", "cmd_vel_robot");
+  declare_parameter("robot_topic_publish_period_ms", 100);
   declare_parameter("head_topic", "cmd_vel_head");
+  declare_parameter("head_topic_publish_period_ms", 50);
   declare_parameter("robot_req_up_topic", "cmd_robot/req_up");
+  declare_parameter("robot_req_up_topic_publish_period_ms", 250);
   declare_parameter("robot_req_down_topic", "cmd_robot/req_down");
+  declare_parameter("robot_req_down_topic_publish_period_ms", 250);
   declare_parameter("pan_max_dps", 10.0f);
   declare_parameter("tilt_max_dps", 10.0f);
 
@@ -160,32 +163,68 @@ std_msgs::msg::Bool Node::create_init_req_down_msg()
   return create_init_req_up_msg();
 }
 
-void Node::init_pub()
+void Node::init_robot_pub()
 {
   _robot_pub = create_publisher<geometry_msgs::msg::Twist>(
-    get_parameter("robot_topic").as_string(), 10);
+    get_parameter("robot_topic").as_string(),
+    10);
 
-  _head_pub = create_publisher<geometry_msgs::msg::Twist>(
-    get_parameter("head_topic").as_string(), 10);
-
-  _robot_req_up_pub = create_publisher<std_msgs::msg::Bool>(
-    get_parameter("robot_req_up_topic").as_string(), 1);
-
-  _robot_req_down_pub = create_publisher<std_msgs::msg::Bool>(
-    get_parameter("robot_req_down_topic").as_string(), 1);
-
-  auto const teleop_topic_publish_period = std::chrono::milliseconds(get_parameter("teleop_topic_publish_period_ms").as_int());
-
-  _teleop_pub_timer = create_wall_timer(
-    teleop_topic_publish_period,
+  _robot_pub_timer = create_wall_timer(
+    std::chrono::milliseconds(get_parameter("robot_topic_publish_period_ms").as_int()),
     [this]()
     {
       _robot_pub->publish(_robot_msg);
+    });
+}
+
+void Node::init_head_pub()
+{
+  _head_pub = create_publisher<geometry_msgs::msg::Twist>(
+    get_parameter("head_topic").as_string(),
+    10);
+
+  _head_pub_timer = create_wall_timer(
+    std::chrono::milliseconds(get_parameter("head_topic_publish_period_ms").as_int()),
+    [this]()
+    {
       _head_pub->publish(_head_msg);
+    });
+}
+
+void Node::init_robot_req_up_pub()
+{
+  _robot_req_up_pub = create_publisher<std_msgs::msg::Bool>(
+    get_parameter("robot_req_up_topic").as_string(),
+    1);
+
+  _robot_req_up_pub_timer = create_wall_timer(
+    std::chrono::milliseconds(get_parameter("robot_req_up_topic_publish_period_ms").as_int()),
+    [this]()
+    {
       _robot_req_up_pub->publish(_req_up_msg);
+    });
+}
+
+void Node::init_robot_req_down_pub()
+{
+  _robot_req_down_pub = create_publisher<std_msgs::msg::Bool>(
+    get_parameter("robot_req_down_topic").as_string(),
+    1);
+
+  _robot_req_down_pub_timer = create_wall_timer(
+    std::chrono::milliseconds(get_parameter("robot_req_down_topic_publish_period_ms").as_int()),
+    [this]()
+    {
       _robot_req_down_pub->publish(_req_down_msg);
-    }
-  );
+    });
+}
+
+void Node::init_pub()
+{
+  init_robot_pub();
+  init_head_pub();
+  init_robot_req_up_pub();
+  init_robot_req_down_pub();
 }
 
 /**************************************************************************************
