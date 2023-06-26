@@ -39,10 +39,12 @@ ros2 topic echo /l3xz/cmd_vel_robot
 | `/l3xz/joy` | [`sensor_msgs/Joy`](http://docs.ros.org/en/api/sensor_msgs/html/msg/Joy.html) |
 
 ##### Published Topics
-|     Default name      |                                          Type                                          |
-|:---------------------:|:--------------------------------------------------------------------------------------:|
-| `/l3xz/cmd_vel_robot` | [`geometry_msgs/Twist`](http://docs.ros.org/en/api/geometry_msgs/html/msg/Twist.html)  |
-| `/l3xz/cmd_vel_head`  | [`geometry_msgs/Twist`](http://docs.ros.org/en/api/geometry_msgs/html/msg/Twist.html)  |
+|        Default name        |                                         Type                                          |
+|:--------------------------:|:-------------------------------------------------------------------------------------:|
+|   `/l3xz/cmd_vel_robot`    | [`geometry_msgs/Twist`](http://docs.ros.org/en/api/geometry_msgs/html/msg/Twist.html) |
+|    `/l3xz/cmd_vel_head`    | [`geometry_msgs/Twist`](http://docs.ros.org/en/api/geometry_msgs/html/msg/Twist.html) |
+|  `/l3xz/cmd_robot/req_up`  |       [`std_msgs/Bool`](http://docs.ros.org/en/api/std_msgs/html/msg/Bool.html)       |
+| `/l3xz/cmd_robot/req_down` |       [`std_msgs/Bool`](http://docs.ros.org/en/api/std_msgs/html/msg/Bool.html)       |
 
 ##### Parameters
 |                   Name                   |       Default        | Description                                                                                                 |
