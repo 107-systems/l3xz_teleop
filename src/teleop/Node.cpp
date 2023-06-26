@@ -85,11 +85,13 @@ void Node::init_sub()
   _joy_sub_options.event_callbacks.deadline_callback =
     [this, joy_topic](rclcpp::QOSDeadlineRequestedInfo & event) -> void
     {
-      RCLCPP_ERROR(get_logger(),
-                   "Dead line configured for topic \"%s\" missed (total_count: %d, total_count_change: %d).",
-                   joy_topic.c_str(),
-                   event.total_count,
-                   event.total_count_change);
+      RCLCPP_ERROR_THROTTLE(get_logger(),
+                            *get_clock(),
+                            1000,
+                            "Dead line configured for topic \"%s\" missed (total_count: %d, total_count_change: %d).",
+                            joy_topic.c_str(),
+                            event.total_count,
+                            event.total_count_change);
     };
 
   _joy_sub_options.event_callbacks.liveliness_callback =
