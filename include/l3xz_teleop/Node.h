@@ -67,6 +67,7 @@ private:
   static std_msgs::msg::Bool create_init_req_down_msg();
   rclcpp::Publisher<std_msgs::msg::Bool>::SharedPtr _robot_req_down_pub;
 
+  rclcpp::TimerBase::SharedPtr _teleop_pub_timer;
   void init_pub();
 
   struct liveliness_gained { };

@@ -14,6 +14,7 @@ def generate_launch_description():
           {'joy_topic': 'joy'},
           {'joy_topic_deadline_ms': 100},
           {'joy_topic_liveliness_lease_duration': 1000},
+          {'teleop_topic_publish_period_ms': 50},
           {'robot_topic': 'cmd_vel_robot'},
           {'head_topic': 'cmd_vel_head'},
           {'robot_req_up_topic': 'cmd_robot/req_up'},

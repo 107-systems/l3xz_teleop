@@ -41,6 +41,7 @@ Node::Node()
   declare_parameter("joy_topic", "joy");
   declare_parameter("joy_topic_deadline_ms", 100);
   declare_parameter("joy_topic_liveliness_lease_duration", 1000);
+  declare_parameter("teleop_topic_publish_period_ms", 50);
   declare_parameter("robot_topic", "cmd_vel_robot");
   declare_parameter("head_topic", "cmd_vel_head");
   declare_parameter("robot_req_up_topic", "cmd_robot/req_up");
@@ -115,19 +116,15 @@ void Node::onJoyMsg(sensor_msgs::msg::Joy::SharedPtr const joy_msg)
 {
   _robot_msg.linear.x  = (-1.0f) * joy_msg->axes[1]; /* LEFT_STICK_VERTICAL   */
   _robot_msg.angular.z =           joy_msg->axes[0]; /* LEFT_STICK_HORIZONTAL */
-  _robot_pub->publish(_robot_msg);
 
   float const pan_angular_velocity_dps  =           joy_msg->axes[3] * get_parameter("pan_max_dps").as_double();  /* RIGHT_STICK_HORIZONTAL */
   float const tilt_angular_velocity_dps = (-1.0f) * joy_msg->axes[4] * get_parameter("tilt_max_dps").as_double(); /* RIGHT_STICK_VERTICAL   */
   _head_msg.angular.z = pan_angular_velocity_dps  * M_PI / 180.0f;
   _head_msg.angular.y = tilt_angular_velocity_dps * M_PI / 180.0f;
-  _head_pub->publish(_head_msg);
 
   _req_up_msg.data = joy_msg->buttons[0] != 0;
-  _robot_req_up_pub->publish(_req_up_msg);
 
   _req_down_msg.data = joy_msg->buttons[1] != 0;
-  _robot_req_down_pub->publish(_req_down_msg);
 }
 
 geometry_msgs::msg::Twist Node::create_init_robot_msg()
@@ -176,6 +173,19 @@ void Node::init_pub()
 
   _robot_req_down_pub = create_publisher<std_msgs::msg::Bool>(
     get_parameter("robot_req_down_topic").as_string(), 1);
+
+  auto const teleop_topic_publish_period = std::chrono::milliseconds(get_parameter("teleop_topic_publish_period_ms").as_int());
+
+  _teleop_pub_timer = create_wall_timer(
+    teleop_topic_publish_period,
+    [this]()
+    {
+      _robot_pub->publish(_robot_msg);
+      _head_pub->publish(_head_msg);
+      _robot_req_up_pub->publish(_req_up_msg);
+      _robot_req_down_pub->publish(_req_down_msg);
+    }
+  );
 }
 
 /**************************************************************************************
