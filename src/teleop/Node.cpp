@@ -32,52 +32,11 @@ Node::Node()
   rclcpp::KeepLast(10),
   rmw_qos_profile_sensor_data
 }
-, _robot_msg
-{
-  []()
-  {
-    geometry_msgs::msg::Twist msg;
-    msg.linear.x  = 0.0;
-    msg.linear.y  = 0.0;
-    msg.linear.z  = 0.0;
-    msg.angular.x = 0.0;
-    msg.angular.y = 0.0;
-    msg.angular.z = 0.0;
-    return msg;
-  }()
-}
-, _head_msg
-{
-  []()
-  {
-    geometry_msgs::msg::Twist msg;
-    msg.linear.x  = 0.0;
-    msg.linear.y  = 0.0;
-    msg.linear.z  = 0.0;
-    msg.angular.x = 0.0;
-    msg.angular.y = 0.0;
-    msg.angular.z = 0.0;
-    return msg;
-  }()
-}
-, _req_up_msg
-{
-  []()
-  {
-    std_msgs::msg::Bool msg;
-    msg.data = false;
-    return msg;
-  }()
-}
-, _req_down_msg
-{
-  []()
-  {
-    std_msgs::msg::Bool msg;
-    msg.data = false;
-    return msg;
-  }()
-}
+, _robot_msg{create_init_robot_msg()}
+, _head_msg{create_init_head_msg()}
+, _req_up_msg{create_init_req_up_msg()}
+, _req_down_msg{create_init_req_down_msg()}
+, _sm(std::make_unique<boost::sml::sm<FsmImpl>>(*this))
 {
   declare_parameter("joy_topic", "joy");
   declare_parameter("joy_topic_deadline_ms", 100);
@@ -143,6 +102,11 @@ void Node::init_sub()
                   event.not_alive_count,
                   event.alive_count_change,
                   event.not_alive_count_change);
+
+      if (event.alive_count > 0)
+        _sm->process_event(liveliness_gained{});
+      else
+        _sm->process_event(liveliness_lost{});
     };
 
   _joy_sub = create_subscription<sensor_msgs::msg::Joy>(
@@ -170,6 +134,39 @@ void Node::onJoyMsg(sensor_msgs::msg::Joy::SharedPtr const joy_msg)
 
   _req_down_msg.data = joy_msg->buttons[1] != 0;
   _robot_req_down_pub->publish(_req_down_msg);
+}
+
+geometry_msgs::msg::Twist Node::create_init_robot_msg()
+{
+  geometry_msgs::msg::Twist msg;
+
+  msg.linear.x  = 0.0;
+  msg.linear.y  = 0.0;
+  msg.linear.z  = 0.0;
+  msg.angular.x = 0.0;
+  msg.angular.y = 0.0;
+  msg.angular.z = 0.0;
+
+  return msg;
+}
+
+geometry_msgs::msg::Twist Node::create_init_head_msg()
+{
+  return create_init_robot_msg();
+}
+
+std_msgs::msg::Bool Node::create_init_req_up_msg()
+{
+  std_msgs::msg::Bool msg;
+
+  msg.data = false;
+
+  return msg;
+}
+
+std_msgs::msg::Bool Node::create_init_req_down_msg()
+{
+  return create_init_req_up_msg();
 }
 
 void Node::init_pub()

@@ -17,6 +17,7 @@ find_package(ros2_heartbeat REQUIRED)
 #######################################################################################
 include_directories(
   include
+  external/sml/current
 )
 #######################################################################################
 add_executable(${L3XZ_TELEOP_TARGET}
