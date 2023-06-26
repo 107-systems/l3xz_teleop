@@ -76,10 +76,16 @@ private:
     auto operator()() const noexcept {
       using namespace boost::sml;
       return make_transition_table(
-        *"standby"_s + event<liveliness_gained> = "active"_s
+        *"standby"_s + event<liveliness_gained> /
+          [](Node & node)
+          {
+            RCLCPP_INFO(node.get_logger(), "liveliness gained for \"%s\"", node._joy_sub->get_topic_name());
+          }
+          = "active"_s
         ,"active"_s + event<liveliness_lost> /
           [](Node & node)
           {
+            RCLCPP_WARN(node.get_logger(), "liveliness lost for \"%s\"", node._joy_sub->get_topic_name());
             /* Set all teleop messages to be at their initial value. */
             node._robot_msg    = Node::create_init_robot_msg();
             node._head_msg     = Node::create_init_head_msg();

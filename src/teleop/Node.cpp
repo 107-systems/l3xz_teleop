@@ -97,14 +97,6 @@ void Node::init_sub()
   _joy_sub_options.event_callbacks.liveliness_callback =
     [this, joy_topic](rclcpp::QOSLivelinessChangedInfo & event) -> void
     {
-      RCLCPP_WARN(get_logger(),
-                  "Liveliness for topic \"%s\" changed (alive_count: %d, not_alive_count: %d, alive_count_change: %d, not_alive_count_change: %d).",
-                  joy_topic.c_str(),
-                  event.alive_count,
-                  event.not_alive_count,
-                  event.alive_count_change,
-                  event.not_alive_count_change);
-
       if (event.alive_count > 0)
         _sm->process_event(liveliness_gained{});
       else
