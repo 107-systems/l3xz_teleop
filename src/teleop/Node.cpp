@@ -81,6 +81,7 @@ Node::Node()
 {
   declare_parameter("joy_topic", "joy");
   declare_parameter("joy_topic_deadline_ms", 100);
+  declare_parameter("joy_topic_liveliness_lease_duration", 1000);
   declare_parameter("robot_topic", "cmd_vel_robot");
   declare_parameter("head_topic", "cmd_vel_head");
   declare_parameter("robot_req_up_topic", "cmd_robot/req_up");
@@ -116,8 +117,11 @@ void Node::init_sub()
 {
   auto const joy_topic = get_parameter("joy_topic").as_string();
   auto const joy_topic_deadline = std::chrono::milliseconds(get_parameter("joy_topic_deadline_ms").as_int());
+  auto const joy_topic_liveliness_lease_duration = std::chrono::milliseconds(get_parameter("joy_topic_liveliness_lease_duration").as_int());
 
   _joy_qos_profile.deadline(joy_topic_deadline);
+  _joy_qos_profile.liveliness(RMW_QOS_POLICY_LIVELINESS_MANUAL_BY_TOPIC);
+  _joy_qos_profile.liveliness_lease_duration(joy_topic_liveliness_lease_duration);
 
   _joy_sub_options.event_callbacks.deadline_callback =
     [this, joy_topic](rclcpp::QOSDeadlineRequestedInfo & event) -> void
@@ -127,6 +131,18 @@ void Node::init_sub()
                    joy_topic.c_str(),
                    event.total_count,
                    event.total_count_change);
+    };
+
+  _joy_sub_options.event_callbacks.liveliness_callback =
+    [this, joy_topic](rclcpp::QOSLivelinessChangedInfo & event) -> void
+    {
+      RCLCPP_WARN(get_logger(),
+                  "Liveliness for topic \"%s\" changed (alive_count: %d, not_alive_count: %d, alive_count_change: %d, not_alive_count_change: %d).",
+                  joy_topic.c_str(),
+                  event.alive_count,
+                  event.not_alive_count,
+                  event.alive_count_change,
+                  event.not_alive_count_change);
     };
 
   _joy_sub = create_subscription<sensor_msgs::msg::Joy>(
