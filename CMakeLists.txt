@@ -14,6 +14,7 @@ find_package(std_msgs REQUIRED)
 find_package(sensor_msgs REQUIRED)
 find_package(geometry_msgs REQUIRED)
 find_package(ros2_heartbeat REQUIRED)
+find_package(mp-units REQUIRED)
 #######################################################################################
 include_directories(
   include
@@ -25,8 +26,8 @@ add_executable(${L3XZ_TELEOP_TARGET}
   src/main.cpp
 )
 #######################################################################################
-target_compile_features(${L3XZ_TELEOP_TARGET} PRIVATE cxx_std_17)
-ament_target_dependencies(${L3XZ_TELEOP_TARGET} rclcpp std_msgs sensor_msgs geometry_msgs ros2_heartbeat)
+target_compile_features(${L3XZ_TELEOP_TARGET} PRIVATE cxx_std_20)
+ament_target_dependencies(${L3XZ_TELEOP_TARGET} rclcpp std_msgs sensor_msgs geometry_msgs ros2_heartbeat mp-units)
 #######################################################################################
 install(TARGETS
   ${L3XZ_TELEOP_TARGET}
