@@ -14,9 +14,17 @@
 #include <numeric>
 #include <sstream>
 
+#include <mp-units/systems/si/si.h>
+#include <mp-units/systems/angular/angular.h>
+
 /**************************************************************************************
  * NAMESPACE
  **************************************************************************************/
+
+using namespace mp_units;
+using mp_units::angular::unit_symbols::deg;
+using mp_units::angular::unit_symbols::rad;
+using mp_units::si::unit_symbols::s;
 
 namespace l3xz
 {
@@ -120,10 +128,15 @@ void Node::onJoyMsg(sensor_msgs::msg::Joy::SharedPtr const joy_msg)
   _robot_msg.linear.x  = (-1.0f) * joy_msg->axes[1]; /* LEFT_STICK_VERTICAL   */
   _robot_msg.angular.z =           joy_msg->axes[0]; /* LEFT_STICK_HORIZONTAL */
 
-  float const pan_angular_velocity_dps  =           joy_msg->axes[3] * get_parameter("pan_max_dps").as_double();  /* RIGHT_STICK_HORIZONTAL */
-  float const tilt_angular_velocity_dps = (-1.0f) * joy_msg->axes[4] * get_parameter("tilt_max_dps").as_double(); /* RIGHT_STICK_VERTICAL   */
-  _head_msg.angular.z = pan_angular_velocity_dps  * M_PI / 180.0f;
-  _head_msg.angular.y = tilt_angular_velocity_dps * M_PI / 180.0f;
+  /* RIGHT_STICK_HORIZONTAL */
+  auto const pan_angular_velocity =
+    (joy_msg->axes[3] * get_parameter("pan_max_dps").as_double()  * deg / s);
+  /* RIGHT_STICK_VERTICAL   */
+  auto const tilt_angular_velocity =
+    (-1. * joy_msg->axes[4] * get_parameter("tilt_max_dps").as_double() * deg / s);
+
+  _head_msg.angular.z = pan_angular_velocity.numerical_value_in(rad/s);
+  _head_msg.angular.y = tilt_angular_velocity.numerical_value_in(rad/s);
 
   _req_up_msg.data = joy_msg->buttons[0] != 0;
 
