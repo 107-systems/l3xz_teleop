@@ -42,6 +42,11 @@ Node::Node()
 }
 , _robot_msg{create_init_robot_msg()}
 , _head_msg{create_init_head_msg()}
+, _head_qos_profile
+{
+  rclcpp::KeepLast(10),
+  rmw_qos_profile_sensor_data
+}
 , _req_up_msg{create_init_req_up_msg()}
 , _req_down_msg{create_init_req_down_msg()}
 , _sm(std::make_unique<boost::sml::sm<FsmImpl>>(*this))
@@ -53,6 +58,8 @@ Node::Node()
   declare_parameter("robot_topic_publish_period_ms", 100);
   declare_parameter("head_topic", "cmd_vel_head");
   declare_parameter("head_topic_publish_period_ms", 50);
+  declare_parameter("head_topic_deadline_ms", 100);
+  declare_parameter("head_topic_liveliness_lease_duration", 1000);
   declare_parameter("robot_req_up_topic", "cmd_robot/req_up");
   declare_parameter("robot_req_up_topic_publish_period_ms", 250);
   declare_parameter("robot_req_down_topic", "cmd_robot/req_down");
@@ -192,12 +199,21 @@ void Node::init_robot_pub()
 
 void Node::init_head_pub()
 {
+  auto const head_topic = get_parameter("head_topic").as_string();
+  auto const head_topic_publish_period = std::chrono::milliseconds(get_parameter("head_topic_publish_period_ms").as_int());
+  auto const head_topic_deadline = std::chrono::milliseconds(get_parameter("head_topic_deadline_ms").as_int());
+  auto const head_topic_liveliness_lease_duration = std::chrono::milliseconds(get_parameter("head_topic_liveliness_lease_duration").as_int());
+
+  _head_qos_profile.deadline(head_topic_deadline);
+  _head_qos_profile.liveliness(RMW_QOS_POLICY_LIVELINESS_MANUAL_BY_TOPIC);
+  _head_qos_profile.liveliness_lease_duration(head_topic_deadline);
+
   _head_pub = create_publisher<geometry_msgs::msg::Twist>(
-    get_parameter("head_topic").as_string(),
-    10);
+    head_topic,
+    _head_qos_profile);
 
   _head_pub_timer = create_wall_timer(
-    std::chrono::milliseconds(get_parameter("head_topic_publish_period_ms").as_int()),
+    head_topic_publish_period,
     [this]()
     {
       _head_pub->publish(_head_msg);
