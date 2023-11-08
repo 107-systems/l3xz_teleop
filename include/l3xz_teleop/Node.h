@@ -58,6 +58,7 @@ private:
 
   geometry_msgs::msg::Twist _head_msg;
   static geometry_msgs::msg::Twist create_init_head_msg();
+  rclcpp::QoS _head_qos_profile;
   rclcpp::Publisher<geometry_msgs::msg::Twist>::SharedPtr _head_pub;
   rclcpp::TimerBase::SharedPtr _head_pub_timer;
   void init_head_pub();

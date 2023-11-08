@@ -18,6 +18,8 @@ def generate_launch_description():
           {'robot_topic_publish_period_ms': 100},
           {'head_topic': 'cmd_vel_head'},
           {'head_topic_publish_period_ms': 50},
+          {'head_topic_deadline_ms': 100},
+          {'head_topic_liveliness_lease_duration': 1000},
           {'robot_req_up_topic': 'cmd_robot/req_up'},
           {'robot_req_up_topic_publish_period_ms': 250},
           {'robot_req_down_topic': 'cmd_robot/req_down'},
