@@ -114,7 +114,7 @@ void Node::init_sub()
     };
 
   _joy_sub_options.event_callbacks.liveliness_callback =
-    [this, joy_topic](rclcpp::QOSLivelinessChangedInfo & event) -> void
+    [this](rclcpp::QOSLivelinessChangedInfo & event) -> void
     {
       if (event.alive_count > 0)
         _sm->process_event(joy_sub_liveliness_gained{});
