@@ -216,7 +216,7 @@ void Node::init_head_pub()
     head_topic_publish_period,
     [this]()
     {
-      _head_pub->publish(_head_msg);
+      _sm->process_event(head_pub_timer_fired{});
     });
 }
 
