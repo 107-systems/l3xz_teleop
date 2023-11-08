@@ -96,11 +96,6 @@ private:
           [](Node & node)
           {
             RCLCPP_WARN(node.get_logger(), "liveliness lost for \"%s\"", node._joy_sub->get_topic_name());
-            /* Set all teleop messages to be at their initial value. */
-            node._robot_msg    = Node::create_init_robot_msg();
-            node._head_msg     = Node::create_init_head_msg();
-            node._req_up_msg   = Node::create_init_req_up_msg();
-            node._req_down_msg = Node::create_init_req_down_msg();
           }
           = "standby"_s
         , "active"_s + event<robot_pub_timer_fired> /
