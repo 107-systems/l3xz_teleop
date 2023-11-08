@@ -117,9 +117,9 @@ void Node::init_sub()
     [this, joy_topic](rclcpp::QOSLivelinessChangedInfo & event) -> void
     {
       if (event.alive_count > 0)
-        _sm->process_event(liveliness_gained{});
+        _sm->process_event(joy_sub_liveliness_gained{});
       else
-        _sm->process_event(liveliness_lost{});
+        _sm->process_event(joy_sub_liveliness_lost{});
     };
 
   _joy_sub = create_subscription<sensor_msgs::msg::Joy>(

@@ -77,8 +77,8 @@ private:
 
   void init_pub();
 
-  struct liveliness_gained { };
-  struct liveliness_lost { };
+  struct joy_sub_liveliness_gained { };
+  struct joy_sub_liveliness_lost { };
   struct robot_pub_timer_fired { };
   struct head_pub_timer_fired { };
 
@@ -86,13 +86,13 @@ private:
     auto operator()() const noexcept {
       using namespace boost::sml;
       return make_transition_table(
-        *"standby"_s + event<liveliness_gained> /
+        *"standby"_s + event<joy_sub_liveliness_gained> /
           [](Node & node)
           {
             RCLCPP_INFO(node.get_logger(), "liveliness gained for \"%s\"", node._joy_sub->get_topic_name());
           }
           = "active"_s
-        ,"active"_s + event<liveliness_lost> /
+        ,"active"_s + event<joy_sub_liveliness_lost> /
           [](Node & node)
           {
             RCLCPP_WARN(node.get_logger(), "liveliness lost for \"%s\"", node._joy_sub->get_topic_name());
