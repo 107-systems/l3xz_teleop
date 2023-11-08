@@ -114,12 +114,12 @@ void Node::init_sub()
     };
 
   _joy_sub_options.event_callbacks.liveliness_callback =
-    [this, joy_topic](rclcpp::QOSLivelinessChangedInfo & event) -> void
+    [this](rclcpp::QOSLivelinessChangedInfo & event) -> void
     {
       if (event.alive_count > 0)
-        _sm->process_event(liveliness_gained{});
+        _sm->process_event(joy_sub_liveliness_gained{});
       else
-        _sm->process_event(liveliness_lost{});
+        _sm->process_event(joy_sub_liveliness_lost{});
     };
 
   _joy_sub = create_subscription<sensor_msgs::msg::Joy>(
@@ -193,7 +193,7 @@ void Node::init_robot_pub()
     std::chrono::milliseconds(get_parameter("robot_topic_publish_period_ms").as_int()),
     [this]()
     {
-      _robot_pub->publish(_robot_msg);
+      _sm->process_event(robot_pub_timer_fired{});
     });
 }
 
@@ -216,7 +216,7 @@ void Node::init_head_pub()
     head_topic_publish_period,
     [this]()
     {
-      _head_pub->publish(_head_msg);
+      _sm->process_event(head_pub_timer_fired{});
     });
 }
 

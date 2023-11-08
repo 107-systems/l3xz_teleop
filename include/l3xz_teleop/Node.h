@@ -77,29 +77,39 @@ private:
 
   void init_pub();
 
-  struct liveliness_gained { };
-  struct liveliness_lost { };
+  struct joy_sub_liveliness_gained { };
+  struct joy_sub_liveliness_lost { };
+  struct robot_pub_timer_fired { };
+  struct head_pub_timer_fired { };
 
   struct FsmImpl {
     auto operator()() const noexcept {
       using namespace boost::sml;
       return make_transition_table(
-        *"standby"_s + event<liveliness_gained> /
+        *"standby"_s + event<joy_sub_liveliness_gained> /
           [](Node & node)
           {
             RCLCPP_INFO(node.get_logger(), "liveliness gained for \"%s\"", node._joy_sub->get_topic_name());
           }
           = "active"_s
-        ,"active"_s + event<liveliness_lost> /
+        ,"active"_s + event<joy_sub_liveliness_lost> /
           [](Node & node)
           {
             RCLCPP_WARN(node.get_logger(), "liveliness lost for \"%s\"", node._joy_sub->get_topic_name());
-            /* Set all teleop messages to be at their initial value. */
-            node._robot_msg    = Node::create_init_robot_msg();
-            node._head_msg     = Node::create_init_head_msg();
-            node._req_up_msg   = Node::create_init_req_up_msg();
-            node._req_down_msg = Node::create_init_req_down_msg();
-          }  = "standby"_s
+          }
+          = "standby"_s
+        , "active"_s + event<robot_pub_timer_fired> /
+          [](Node & node)
+          {
+            node._robot_pub->publish(node._robot_msg);
+          }
+          = "active"_s
+        , "active"_s + event<head_pub_timer_fired> /
+          [](Node & node)
+          {
+            node._head_pub->publish(node._head_msg);
+          }
+          = "active"_s
       );
     }
   };
