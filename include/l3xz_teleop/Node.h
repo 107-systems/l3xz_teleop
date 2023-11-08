@@ -79,6 +79,7 @@ private:
 
   struct liveliness_gained { };
   struct liveliness_lost { };
+  struct robot_pub_timer_fired { };
   struct head_pub_timer_fired { };
 
   struct FsmImpl {
@@ -101,6 +102,9 @@ private:
             node._req_up_msg   = Node::create_init_req_up_msg();
             node._req_down_msg = Node::create_init_req_down_msg();
           }  = "standby"_s
+          , "active"_s + event<robot_pub_timer_fired> /
+            [](Node & node) { node._robot_pub->publish(node._robot_msg); }
+            = "active"_s
           , "active"_s + event<head_pub_timer_fired> /
             [](Node & node) { node._head_pub->publish(node._head_msg); }
             = "active"_s

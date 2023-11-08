@@ -193,7 +193,7 @@ void Node::init_robot_pub()
     std::chrono::milliseconds(get_parameter("robot_topic_publish_period_ms").as_int()),
     [this]()
     {
-      _robot_pub->publish(_robot_msg);
+      _sm->process_event(robot_pub_timer_fired{});
     });
 }
 
