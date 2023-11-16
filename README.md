@@ -11,37 +11,7 @@ Teleoperation for L3X-Z via PS3 joystick and ROS topics.
 </p>
 
 #### How-to-build
-* Install `gsl-lite`
-```bash
-git clone https://github.com/gsl-lite/gsl-lite && cd gsl-lite
-mkdir build && cd build
-cmake .. && make -j8
-sudo make install
-```
-* Install `Catch2`
-```bash
-git clone https://github.com/catchorg/Catch2 && cd Catch2
-mkdir build && cd build
-cmake .. && make -j8
-sudo make install
-```
-* Install `fmt`
-```bash
-git clone https://github.com/fmtlib/fmt && cd fmt
-mkdir build && cd build
-cmake -DFMT_TEST=OFF ..
-make -j8
-sudo make install
-```
-* Install `mp-units`
-```bash
-git clone https://github.com/mpusz/mp-units && cd mp-units
-mkdir build && cd build
-cmake -DMP_UNITS_AS_SYSTEM_HEADERS=ON -DMP_UNITS_BUILD_LA=OFF ..
-make -j8
-sudo make install
-```
-* Build with `colcon`
+Note: Don't forget to install the [dependencies](https://github.com/107-systems/t07_teleop#install-dependencies).
 ```bash
 cd $COLCON_WS/src
 git clone https://github.com/107-systems/l3xz_teleop
@@ -95,3 +65,35 @@ ros2 topic echo /l3xz/cmd_vel_robot
 | `robot_req_down_topic_publish_period_ms` |         250          | Publishing period for sit down request messages in milliseconds (ms).                                        |
 |              `pan_max_dps`               |        10.0°         | Maximum target angular velocity for pan servo of the L3X-Z sensor head.                                      |
 |              `tilt_max_dps`              |        10.0°         | Maximum target angular velocity for tilt servo of the L3X-Z sensor head.                                     |
+
+#### Install dependencies
+* Install `gsl-lite`
+```bash
+git clone https://github.com/gsl-lite/gsl-lite && cd gsl-lite
+mkdir build && cd build
+cmake .. && make -j8
+sudo make install
+```
+* Install `Catch2`
+```bash
+git clone https://github.com/catchorg/Catch2 && cd Catch2
+mkdir build && cd build
+cmake .. && make -j8
+sudo make install
+```
+* Install `fmt`
+```bash
+git clone https://github.com/fmtlib/fmt && cd fmt
+mkdir build && cd build
+cmake -DFMT_TEST=OFF ..
+make -j8
+sudo make install
+```
+* Install `mp-units`
+```bash
+git clone https://github.com/mpusz/mp-units && cd mp-units
+mkdir build && cd build
+cmake -DMP_UNITS_AS_SYSTEM_HEADERS=ON -DMP_UNITS_BUILD_LA=OFF ..
+make -j8
+sudo make install
+```
